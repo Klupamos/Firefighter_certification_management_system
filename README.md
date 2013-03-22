@@ -1,9 +1,12 @@
 Fire_Fire_Fire
 ==============
 
-First Commet
- - Only changed this one file
-Second Comment
- - Changed this file again so I could get some practice with git
- - Also Tacos rule!
+Abstract:
+	Fire_Fire_Fire is a seinor design project thats aims to create a certificate managment and tracting system for among others the state of Alaska Firefighter Saftey Council.
 
+
+Authors:
+	Greg Kluapr
+	Robert Houlding
+	Zak Williams
+	Ryan Houlding

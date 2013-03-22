@@ -1,3 +1,21 @@
+# C Extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cg
+lib
+lib64
+
 # Compiled Object files
 *.slo
 *.lo
