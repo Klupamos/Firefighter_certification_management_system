@@ -1,0 +1,144 @@
+<!-- SF 2.2.2 -->
+<html>
+<style>
+
+.Left_Nav {
+	background-color: black;
+	float: left;
+	height: 100%;
+	list-style-type: none;
+}
+
+.Left_Nav ul {
+	list-style-type: none;
+	padding: 0px;
+}
+
+.Left_Nav li,a{
+	display: block;
+	text-decoration: none;
+	text-transform: uppercase;
+	margin: 5px;
+	text-align: center;
+}
+
+.Left_Nav a:link,a:visited{
+	color: orange;
+}
+
+.Left_Nav a:hover{
+	color: red;
+}
+
+span{
+	text-align: center;
+	display: inline-block;
+	width: 125px;
+}
+.Candidate_Name{
+	text-align: right;
+}
+.Accept{
+}
+.Transfer{
+}
+
+</style>
+<body>
+
+<div class="Left_Nav">
+<ul>
+	<li><a href="./Personal_Info.html">Personal Info</a></li>
+	<li><a href="./Personal_Certifications.html">Certifications</a></li>
+	<li><a href="./Training_Officer.html">Training Officer</a></li>
+	<li><a href="./Certifying_Officer.html">Certifying Officer</a></li>
+	<li><a href="./Administrator.html">Administartor</a></li>
+</ul>
+</div>
+
+<div id="Content">
+	<div>
+		<span class="Candidate_Name">Candidate Name</span>
+		<span class="Accept">Accept</span>
+		<span class="Transfer">Transfer</span>
+		<br>
+		
+		<span class="Candidate_Name">Frank Timberson</span>
+		<span class="Accept"><input type="checkbox" /></span>
+		<span class="Transfer">
+			<select>
+				<option>City of Fairbanks FD</option>
+				<option>North Pole FD</option>
+				<option>Chignik Bay VFD</option>
+				<option>Sitka FD</option>
+				<option>Ketchikan FD</option>
+				<option>Central Mat-Su FD</option>
+				<option>Division of Fire and Life Safety</option>
+				<option>Anchorage FD</option>
+			</select>
+		</span>
+		<br>
+		
+		<span class="Candidate_Name">Tim Berkly</span>
+		<span class="Accept"><input type="checkbox" /></span>
+		<span class="Transfer">
+			<select>
+				<option>City of Fairbanks FD</option>
+				<option>North Pole FD</option>
+				<option>Chignik Bay VFD</option>
+				<option>Sitka FD</option>
+				<option>Ketchikan FD</option>
+				<option>Central Mat-Su FD</option>
+				<option>Division of Fire and Life Safety</option>
+				<option>Anchorage FD</option>
+			</select>
+		</span>
+		<br>
+		
+		<input type="submit" value="Submit"></input>
+	</div>
+
+	<br>
+
+	<div>
+		<label>Candidate Name:</label>
+		<select>
+			<option>Frank Timberson</option>
+			<option>Tim Berkly</option>
+		</select>
+		
+		<label>Certification:</label>
+		<select>
+			<option>Firefighter I</option>
+			<option>Firefighter II</option>
+			<option>Firefighter III</option>
+		</select>
+		<br>
+		<br>
+
+		<span class="Requirements">Requirement</span>
+		<span class="Recomendation">Date</span>
+		<span style="font-size:0.6em;">HTML5(not IE or Firefox)</span>
+		<br>
+		
+		<span class="Requirements">...</span>
+		<span class="Recomendation"><input type="date"/> </span>
+		<br>
+		
+		<span class="Requirements">...</span>
+		<span class="Recomendation"><input type="date"/> </span>
+		<br>
+		
+		<span class="Requirements">...</span>
+		<span class="Recomendation"><input type="date"/> </span>
+		<br>
+		
+		
+		<input type="submit" value="Submit" >
+	</div>
+
+
+	
+</div>
+</body>
+</html>

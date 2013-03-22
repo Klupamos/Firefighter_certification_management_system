@@ -1,0 +1,391 @@
+<!-- SF 2.2.2 -->
+<html>
+<style>
+div div{
+	border: 0px solid black;
+}
+
+div H1{
+	margin: 0px;
+}
+
+.Left_Nav {
+	background-color: black;
+	float: left;
+	height: 100%;
+	list-style-type: none;
+}
+
+.Left_Nav ul {
+	list-style-type: none;
+	padding: 0px;
+}
+
+.Left_Nav li,a{
+	display: block;
+	text-decoration: none;
+	text-transform: uppercase;
+	margin: 5px;
+	text-align: center;
+}
+
+.Left_Nav a:link,a:visited{
+	color: orange;
+}
+
+.Left_Nav a:hover{
+	color: red;
+}
+
+span{
+	text-align: center;
+	display: inline-block;
+	width: 125px;
+}
+
+span.Candidate_Name{
+	text-align: right;
+}
+
+span.Certification{
+	text-align: right;
+}
+
+span.Jurisdiction{
+	width: 150px;
+}
+
+
+</style>
+<script>
+function Action_Change(){
+	var form_action = document.getElementById("Action");
+	var form_account = document.getElementById("Account");
+	
+	var form_cert = document.getElementById("Certification");
+	
+	var form_jur_lbl = document.getElementsByTagName("label");
+	var form_jur = document.getElementById("Jurisdiction");
+	
+	var form_submit = document.getElementById("GO");
+	
+	if(form_action.selectedIndex <= 3 || form_action.selectedIndex >= 8){
+		form_jur.style.display="none";
+	}else{
+		form_jur.style.display="inline";
+	}
+
+	if(form_action.selectedIndex != 3){
+		form_cert.style.display="none";
+	}else{
+		form_cert.style.display ="inline";
+	}
+
+	
+	if(form_action.selectedIndex >= 2){
+		form_submit.value = form_action.options[form_action.selectedIndex].text.split(" ")[0];
+		form_submit.style.display="inline";
+	}else{
+		form_submit.style.display ="none";
+	}
+}
+
+function Additional_Requirement(){
+	var selections = document.getElementById("Cert_Req_List").getElementsByTagName("select");
+	var last = selections.length-1;
+	var line_break = document.createElement("br");
+	
+	if (selections[last].selectedIndex != 0){
+		selections[last].parentNode.appendChild(line_break);
+		selections[last].parentNode.appendChild(selections[last].cloneNode(true));
+	}
+}
+
+</script>
+<body>
+
+<div class="Left_Nav">
+<ul>
+	<li><a href="./Personal_Info.html">Personal Info</a></li>
+	<li><a href="./Personal_Certifications.html">Certifications</a></li>
+	<li><a href="./Training_Officer.html">Training Officer</a></li>
+	<li><a href="./Certifying_Officer.html">Certifying Officer</a></li>
+	<li><a href="./Administrator.html">Administartor</a></li>
+</ul>
+</div>
+
+<div>
+
+	<div id="Def_Req">
+		<h1>Create Requirement (2.2.5)</h1>
+		<label for="req_name">Requirement Name:</label>
+		<input id="req_name" type="text"/>
+		<br>
+		<input type="submit" value="Create" />
+	</div>
+	
+	<div id="Def_Cert">
+		<h1>Create Certification (2.2.6)</h1>
+		
+		<label for="cert_name">Certification Name</label>
+		<input id="cert_name" type="text"/>
+		<br>
+		
+		<label>Description:</label><br>
+		<textarea rows="5" cols="35" ></textarea>
+		<br>
+		
+		<label>Requirements:</label>
+		<div id="Cert_Req_List">
+		
+		<select onchange="Additional_Requirement()">
+			<option>-----</option>
+			<option>Fire-safety 1</option>
+			<option>Fire-safety 2</option>
+			<option>Fire-safety 3</option>
+		</select>
+		</div>
+		<br>
+		
+
+		<input type="submit" value="Create" />
+	</div>
+	
+	<div id="Add_Cert">
+		<h1>Approve Certification (2.2.9)</h1>
+		<span class="Candidate_Name">Candidate Name</span>
+		<span class="Certification">Certification</span>
+		<span class="Accept">Accept</span>
+		<br>
+		
+		<span class="Candidate_Name">Frank Timberson</span>
+		<span class="Certification">Basic Firefighter</span>
+		<span class="Accept"><input type="checkbox"/></span>
+		<br>
+		
+		<span class="Candidate_Name">Tim Berkly</span>
+		<span class="Certification">Firefighter I</span>
+		<span class="Accept"><input type="checkbox"/></span>
+		<br>
+		
+		<input type="submit" value="Approve"/>
+	</div>
+
+	<div id="Junc_Tran">
+		<h1>Aprove canidate jurisdiction transfer (2.2.15)</h1>
+		<span class="Candidate_Name">Candidate Name</span>
+		<span class="Jurisdiction">Jurisdiction</span>
+		<span class="Accept">Accept</span>
+		<br>
+		
+		<span class="Candidate_Name">Frank Timberson</span>
+		<span class="Jurisdiction">Sitka FD</span>
+		<span class="Accept"><input type="checkbox"/></span>
+		<br>
+		
+		<span class="Candidate_Name">Tim Berkly</span>
+		<span class="Jurisdiction">City of Fairbanks FD</span>
+		<span class="Accept"><input type="checkbox"/></span>
+		<br>
+		<input type="submit" value="Transfer"/>
+		
+	</div>
+	
+	<!--	
+	<div id="Sub_Cert">
+		<h1>Revoke Candidate Certification (2.2.11)</h1>
+		
+		<label>Candidate Name:</label>
+		<select>
+			<option>-----</option>
+			<option>Frank Timberson</option>
+			<option>Tim Berkly</option>
+		</select>
+		
+		<label>Certification:</label>
+		<select>
+			<option>-----</option>
+			<option>Firefighter I</option>
+			<option>Firefighter II</option>
+			<option>Firefighter III</option>
+		</select>
+		
+		<input type="submit" value="Revoke"/>
+		
+	</div>
+	
+
+	
+	<div id="Add_TO">
+		<h1>Appoint Training Officer over jurisdiction (2.2.16)</h1>
+		
+		<label>Candidate Name:</label>
+		<select>
+			<option>-----</option>
+			<option>Frank Timberson</option>
+			<option>Tim Berkly</option>
+		</select>
+		
+		<label>Jurisdiction:</label>
+		<select>
+			<option>-----</option>
+			<option>Sitka FD</option>
+			<option>City of Fairbanks FD</option>
+		</select>
+		
+		<input type="submit" value="Appoint"/>
+	</div>
+	
+	<div id="Sub_TO">
+		<h1>Revoke Training Officer permissions (2.2.17)</h1>
+		
+		<label>Training Officer Name:</label>
+		<select>
+			<option>-----</option>
+			<option>Frank Timberson</option>
+			<option>Tim Berkly</option>
+		</select>
+		
+		<label>Jurisdiction:</label>
+		<select>
+			<option>-----</option>
+			<option>Sitka FD</option>
+			<option>City of Fairbanks FD</option>
+		</select>
+		
+		<input type="submit" value="Revoke"/>
+	</div>
+	
+	<div id="Add_CO">
+		<h1>Appoint Certifying Officer over jurisdiction (2.2.18)</h1>
+		
+		<label>Candidate Name:</label>
+		<select>
+			<option>-----</option>
+			<option>Frank Timberson</option>
+			<option>Tim Berkly</option>
+		</select>
+		
+		<label>Jurisdiction:</label>
+		<select>
+			<option>-----</option>
+			<option>Sitka FD</option>
+			<option>City of Fairbanks FD</option>
+		</select>
+		
+		<input type="submit" value="Revoke"/>
+	</div>
+	
+	<div id="Sub_CO">
+		<h1>Revoke Certifying Officer permissions (2.2.19)</h1>
+		
+		<label>Certifying Officer Name:</label>
+		<select>
+			<option>-----</option>
+			<option>Frank Timberson</option>
+			<option>Tim Berkly</option>
+		</select>
+		
+		<label>Jurisdiction:</label>
+		<select>
+			<option>-----</option>
+			<option>Sitka FD</option>
+			<option>City of Fairbanks FD</option>
+		</select>
+		
+		<input type="submit" value="Revoke"/>
+	</div>
+	
+	<div id="Add_Admn">
+		<h1>Appoint Administrator status (2.2.20)</h1>
+		<label>Candidate Name:</label>
+		<select>
+			<option>-----</option>
+			<option>Frank Timberson</option>
+			<option>Tim Berkly</option>
+		</select>
+		<input type="submit" value="Make Admin"/>
+	</div>
+	
+	<div id="Sub_Admn">
+		<h1>Revoke Administrator status (2.2.21)</h1>
+		<label>Admin Name:</label>
+		<select>
+			<option>-----</option>
+			<option>Frank Timberson</option>
+			<option>Tim Berkly</option>
+		</select>
+		<input type="submit" value="Make Admin"/>
+	</div>
+	
+	<div id="Ret_Cand">
+		<h1>Retire Candidate (2.2.22)</h1>
+	</div>
+	
+	<div id="View_Info">
+		<h1>View candidate personal information (user defination)</h1>
+	</div>
+	
+-->	
+
+	<div>
+	<h1>Misc</h1>
+		<label for="Action">Action:</label>
+		<select id="Action" onchange="Action_Change()">
+			<option>-----</option>
+			<option>Verify Account Information</option>
+			<option>Retire Account</option>
+			<option>Revoke Certification</option>
+			<option>Appoint Training Officier</option>
+			<option>Revoke Training Officier</option>
+			<option>Appoint Certifying Officier</option>
+			<option>Revoke Certifying Officier</option>
+			<option>Appoint Administrator</option>
+			<option>Revoke Administrator</option>
+		</select>
+		
+	
+		<div id="Account">
+			<label>Account Name:</label>
+			<select onchange="Account_Change()">
+				<option>-----</option>
+				<option>Frank Timberson</option>
+				<option>Tim Berkly</option>
+			</select>
+		</div>
+		
+		
+		<div id="Jurisdiction">
+			<label>Jurisdiction:</label>
+			<select>
+				<option>-----</option>
+				<option>City of Fairbanks FD</option>
+				<option>North Pole FD</option>
+				<option>Chignik Bay VFD</option>
+				<option>Sitka FD</option>
+				<option>Ketchikan FD</option>
+				<option>Central Mat-Su FD</option>
+				<option>Division of Fire and Life Safety</option>
+				<option>Anchorage FD</option>
+			</select>
+		</div>
+		
+		
+		<div id="Certification">
+			<label>Certification:</label>
+			<select>
+				<option>-----</option>
+				<option>Firefighter I</option>
+				<option>Firefighter II</option>
+				<option>Firefighter III</option>
+			</select>
+		</div>
+		<br>
+		
+		<input id="GO" type="submit" style="display:none;"/>
+	</div>
+	
+	
+</div>
+</body>
+</html>
