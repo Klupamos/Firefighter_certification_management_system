@@ -1,0 +1,95 @@
+<html>
+<style>
+.sub_set{
+	float: left;
+	width: 300px;
+}
+
+.sub_set input{
+	width:100%;
+}
+
+input{
+	width: 100px;
+}
+
+.Left_Nav {
+	background-color: black;
+	float: left;
+	height: 100%;
+	list-style-type: none;
+}
+
+.Left_Nav ul {
+	list-style-type: none;
+	padding: 0px;
+}
+
+.Left_Nav li, .Left_Nav a{
+	display: block;
+	text-decoration: none;
+	text-transform: uppercase;
+	margin: 5px;
+	text-align: center;
+}
+
+.Left_Nav a:link, .Left_Nav a:visited{
+	color: orange;
+}
+
+.Left_Nav a:hover{
+	color: red;
+}
+
+</style>
+<body>
+
+<div class="Left_Nav">
+<ul>
+	<li><a href="./Login.html">Login</a></li>
+	<li><a href="./Account_Creation.html">Create Account</a></li>
+	<li><a href="./Certification_Definitions.html">Certification Table</a></li>
+</ul>
+</div>
+
+
+
+<form action="#" method="POST">
+	<fieldset>
+		<legend>Personal Information:</legend>
+		<fieldset class="sub_set">
+			<legend>Contact</legend>
+			First Name: <input type="text"><br>
+			Middle Initial: <input type="text"><br>
+			Last Name: <input type="text"><br>
+			Suffix: <input type="text"><br>
+			Telephone: <input type="text"><br>
+			Email: <input type="text"><br>
+			Street Address: <input type="text"><br>
+			City: <input type="text"><br>
+			State: <input type="text"><br>
+			Zip: <input type="text"><br>
+			Jurisdiction: <select>
+				<option>City of Fairbanks FD</option>
+				<option>North Pole FD</option>
+				<option>Chignik Bay VFD</option>
+				<option>Sitka FD</option>
+				<option>Ketchikan FD</option>
+				<option>Central Mat-Su FD</option>
+				<option>Division of Fire and Life Safety</option>
+				<option>Anchorage FD</option>
+			</select>
+		</fieldset>
+		<fieldset id="login_info" class="sub_set">
+			<legend> Login Credentials</legend>
+			Username: <input type="text"><br>
+			Password: <input type="password"><br>
+			Confirm Password: <input type="password"><br>
+		</fieldset>
+	</fieldset>
+	<input id="form_submit_button" type="submit" value="Create">
+</form>
+
+
+</body>
+</html>

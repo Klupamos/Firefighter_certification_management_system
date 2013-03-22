@@ -1,0 +1,94 @@
+<!-- SF 2.2.2 -->
+<html>
+<style>
+.Left_Nav {
+	background-color: black;
+	float: left;
+	height: 100%;
+	list-style-type: none;
+}
+
+.Left_Nav ul {
+	list-style-type: none;
+	padding: 0px;
+}
+
+.Left_Nav li,a{
+	display: block;
+	text-decoration: none;
+	text-transform: uppercase;
+	margin: 5px;
+	text-align: center;
+}
+
+.Left_Nav a:link,a:visited{
+	color: orange;
+}
+
+.Left_Nav a:hover{
+	color: red;
+}
+
+span{
+	text-align: center;
+	display: inline-block;
+	width: 125px;
+}
+.Candidate_Name{
+	text-align: right;
+}
+.Requirements {
+
+}
+.Recomendation{
+
+}
+
+input[type=submit]{
+	width: 375px;
+
+}
+
+</style>
+<body>
+
+<div class="Left_Nav">
+<ul>
+	<li><a href="./Personal_Info.html">Personal Info</a></li>
+	<li><a href="./Personal_Certifications.html">Certifications</a></li>
+	<li><a href="./Training_Officer.html">Training Officer</a></li>
+	<li><a href="./Certifying_Officer.html">Certifying Officer</a></li>
+	<li><a href="./Administrator.html">Administartor</a></li>
+</ul>
+</div>
+
+
+
+<div id="Content">
+<label>Certification:</label>
+<select name="Cert">
+	<option>Firefighter I</option>
+	<option>Firefighter II</option>
+	<option>Firefighter III</option>
+	<option>Hazmat Training</option>		
+</select>
+<br><br>
+		<span class="Candidate_Name">Candidate Name</span>
+		<span class="Requirements">Meets Requirements</span>
+		<span class="Recomendation">Would recomend</span>
+		<br>
+		<span class="Candidate_Name">Frank Timberson</span>
+		<span class="Requirements"> <input type="checkbox" checked disabled /> </span>
+		<span class="Recomendation"><input type="checkbox" /> </span>
+		<br>
+		<span class="Candidate_Name">Tim Berkly</span>
+		<span class="Requirements"> <input type="checkbox" disabled /> </span>
+		<span class="Recomendation"><input type="checkbox" /> </span>
+		<br>
+		
+		<input type="submit" value="Submit" >
+</div>
+
+
+</body>
+</html>

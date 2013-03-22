@@ -1,0 +1,137 @@
+<!-- SF 2.2.2 -->
+<html>
+<style>
+.sub_set{
+	width: 350px;
+	padding:0px;
+	margin: auto;
+}
+
+.sub_set .sub_set{
+	margin:auto;
+	margin-bottom: 5px;
+	width: 95%;
+}
+
+li.earned{
+	list-style-type: disc;
+}
+
+li.unearned{
+	list-style-type: circle;
+}
+
+li.unearned input{
+	disabled: true;
+}
+
+.expiry_notice{
+	border-bottom: 1px dashed red;
+}
+
+.Left_Nav {
+	background-color: black;
+	float: left;
+	height: 100%;
+	list-style-type: none;
+}
+
+.Left_Nav ul {
+	list-style-type: none;
+	padding: 0px;
+}
+
+.Left_Nav li,a{
+	display: block;
+	text-decoration: none;
+	text-transform: uppercase;
+	margin: 5px;
+	text-align: center;
+}
+
+.Left_Nav a:link,a:visited{
+	color: orange;
+}
+
+.Left_Nav a:hover{
+	color: red;
+}
+
+time{
+	font-size: 0.8em;
+}
+
+</style>
+<body>
+
+<div class="Left_Nav">
+<ul>
+	<li><a href="./Personal_Info.html">Personal Info</a></li>
+	<li><a href="./Personal_Certifications.html">Certifications</a></li>
+	<li><a href="./Training_Officer.html">Training Officer</a></li>
+	<li><a href="./Certifying_Officer.html">Certifying Officer</a></li>
+	<li><a href="./Administrator.html">Administartor</a></li>
+</ul>
+</div>
+
+
+	<fieldset class="sub_set">
+		<legend>Earned Certifications</legend>
+		<ul>
+			<li class="earned">
+				<input type="checkbox">
+				Basic Firefighter
+				<time>(31/12/1995)</time>
+			</li>
+			<li class="earned" >
+				<input type="checkbox">
+				Haz-Mat Awareness
+				<time class="expiry_notice" title="Expires (31/12/2013)">(31/12/1995)</time>
+		<!-- Titles are bad for touchscreens -->
+			</li>
+		</ul>
+	</fieldset>
+	<fieldset class="sub_set">
+		<legend>Partial Certifications</legend>
+		<fieldset class="sub_set">
+			<legend>Firefighter I</legend>
+			<ul>
+				<li class="earned">
+					<input type="checkbox">
+					Notice Flames
+					<time>(31/12/1995)</time>
+				</li>
+				<li class="unearned">
+					<input type="checkbox" disabled>
+					Calmy evacuate location
+				</li>
+			</ul>
+		</fieldset>
+		<fieldset class="sub_set">
+			<legend>Firefighter I</legend>
+			<ul>
+				<li class="earned">
+					<input type="checkbox">
+					Notice Flames
+					<time>(31/12/1995)</time>
+				</li>
+				<li class="unearned">
+					<input type="checkbox" disabled>
+					Calmy evacuate location
+				</li>
+			</ul>
+		</fieldset>
+	</fieldset>
+	<fieldset class="sub_set">
+	<legend>Expired Certifications</legend>
+		<ul>
+			<li class="unearned">
+				<input type="checkbox" disabled>
+				Firefighter III expired:
+				<time>(31/12/1995)</time>
+			</li>
+		</ul>
+	</fieldset>
+
+</body>
+</html>
