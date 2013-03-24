@@ -1,0 +1,5 @@
+{% extends "base_template.djt" %}
+
+{% block content %}
+<h1>Training Officer Control Panel</h1>
+{%endblock %}

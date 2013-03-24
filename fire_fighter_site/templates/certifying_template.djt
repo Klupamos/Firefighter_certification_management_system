@@ -1,0 +1,6 @@
+{% extends "base_template.djt" %}
+
+
+{% block content %}
+<h1>Certifying Officer Control Panel</h1>
+{%endblock %}
