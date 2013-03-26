@@ -1,1 +1,1 @@
-{% block ajax_data %}server error: replacing ajax data response{% endblock %}
+{% block ajax_data %}ajax error: empty block{% endblock %}

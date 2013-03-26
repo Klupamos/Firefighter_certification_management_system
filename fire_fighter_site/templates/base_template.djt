@@ -1,6 +1,7 @@
 <html>
 	<head>
 		<link rel="stylesheet" type"text/css" href="static/default.css" />
+        <script>document.cookie="javascript_enabled=1;"</script>
 		{% block head %}{% endblock %}
 	</head>
 	<body>
