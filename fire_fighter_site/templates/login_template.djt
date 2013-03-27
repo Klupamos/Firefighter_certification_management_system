@@ -1,13 +1,7 @@
 {% extends "base_template.djt" %}
 
 {% block head %}
-<<<<<<< HEAD
 
-=======
-<script>
-// md5hash()
-</script>
->>>>>>> f6f00b7c51ca760cbead9fd4598db3691075ff5e
 {% endblock %}
 
 {% block content %}
@@ -23,8 +17,4 @@
         <input type="submit">
     </fieldset>
 </form>
-<<<<<<< HEAD
 {%endblock %}
-=======
-{%endblock %}
->>>>>>> f6f00b7c51ca760cbead9fd4598db3691075ff5e
