@@ -1,3 +1,6 @@
+# the sqlite3 database
+*.sqlite3
+
 # C Extensions
 *.so
 
