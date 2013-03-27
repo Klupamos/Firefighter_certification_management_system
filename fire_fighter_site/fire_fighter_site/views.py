@@ -32,7 +32,7 @@ from django.contrib.auth import logout
 from django.core.context_processors import csrf
 def login_view(request):
 
-    if (user.is_authenticated()):
+    if (request.user.is_authenticated()):
         return redirect('/account_info')
 
     sent_username = request.POST.get('username', 'default')
