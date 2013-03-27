@@ -1,21 +1,21 @@
 from django.conf.urls import patterns, include, url
+from fire_fighter_site.views.presentation import login, logout, create, public_certs, account_info, account_certs, training, certifying, admin
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$', 'fire_fighter_site.views.login_view'),
-    url(r'^login$', 'fire_fighter_site.views.login_view'),
-    url(r'^logout$', 'fire_fighter_site.views.logout_view'),
-    url(r'^create$', 'fire_fighter_site.views.create_account_view'),
-    url(r'^public_certs$', 'fire_fighter_site.views.public_certs_view'),
-    url(r'^account_info$', 'fire_fighter_site.views.account_info_view'),
-    url(r'^account_certs$', 'fire_fighter_site.views.account_certs_view'),
-    url(r'^training$', 'fire_fighter_site.views.training_view'),
-    url(r'^certifying$', 'fire_fighter_site.views.certifying_view'),
-    url(r'^admin$', 'fire_fighter_site.views.admin_view'),
-
+    url(r'^$',              login.display),
+    url(r'^login$',         login.display),
+    url(r'^logout$',        logout.display),
+    url(r'^create$',        create.display),
+    url(r'^public_certs$',  public_certs.display),
+    url(r'^account_info$',  account_info.display),
+    url(r'^account_certs$', account_certs.display),
+    url(r'^training$',      training.display),
+    url(r'^certifying$',    certifying.display),
+    url(r'^admin$',         admin.display),
                        
     # Examples:
     # url(r'^$', 'fire_fighter_site.views.home', name='home'),
