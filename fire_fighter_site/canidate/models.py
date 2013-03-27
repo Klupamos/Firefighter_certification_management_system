@@ -27,7 +27,7 @@ class User(models.Model):
 	#need to add somthing here to make sure that user does not put in an arbitrary FF ID, or make this a foregin key with some kind of look up in the implementation
 	fire_dept = CharField(max_length = 50)
 	email = EmailField()i
-
+	
 class Jurisdiction(models.Model):
 	jurisdiction_ID = CharField(max_length = 8, primary_key = True)
 	name = CharField(max_length = 50)
