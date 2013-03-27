@@ -1,0 +1,129 @@
+<!-- SF 2.2.2 -->
+<html>
+<style>
+.sub_set{
+	
+	width: 550px;
+	margin: auto;
+}
+
+.sub_set input{
+	width:100%;
+}
+.sub_set .sub_set{
+	width: 40%;
+	margin: auto;
+	float: left;
+}
+
+input{
+	width: 100px;
+}
+
+li.expiry_notice:after{
+	color: red;
+	background-color: yellow;
+	content: " - Expires (31/12/1995)";
+}
+
+li.earned{
+	list-style-type: disc;
+}
+
+li.earned:after{
+	background-color: blue;
+}
+
+li.unearned{
+	list-style-type: circle;
+}
+
+.Left_Nav {
+	background-color: black;
+	float: left;
+	height: 100%;
+	list-style-type: none;
+}
+
+.Left_Nav ul {
+	list-style-type: none;
+	padding: 0px;
+}
+
+.Left_Nav li,a{
+	display: block;
+	text-decoration: none;
+	text-transform: uppercase;
+	margin: 5px;
+	text-align: center;
+}
+
+.Left_Nav a:link,a:visited{
+	color: orange;
+}
+
+.Left_Nav a:hover{
+	color: red;
+}
+
+</style>
+<body>
+
+<div class="Left_Nav">
+<ul>
+	<li><a href="./Personal_Info.html">Personal Info</a></li>
+	<li><a href="./Personal_Certifications.html">Certifications</a></li>
+	<li><a href="./Training_Officer.html">Training Officer</a></li>
+	<li><a href="./Certifying_Officer.html">Certifying Officer</a></li>
+	<li><a href="./Administrator.html">Administartor</a></li>
+</ul>
+</div>
+
+<div id="Notice">
+	<span style="background-color:yellow; color:red;">New Transfer Requests!</span>
+</div>
+
+<form action="#" method="POST">
+	<fieldset class="sub_set">
+		<legend>Personal Information:</legend>
+		<fieldset class="sub_set">
+			<legend>Contact</legend>
+			First Name: <input type="text"><br>
+			Middle Initial: <input type="text"><br>
+			Last Name: <input type="text"><br>
+			Suffix: <input type="text"><br>
+			Telephone: <input type="text"><br>
+			Email: <input type="text"><br>
+			Street Address: <input type="text"><br>
+			City: <input type="text"><br>
+			State: <input type="text"><br>
+			Zip: <input type="text"><br>
+		</fieldset>
+		<fieldset id="login_info" class="sub_set">
+			<legend> Login Credentials</legend>
+			Username: <input type="text"><br>
+			Password: <input type="password"><br>
+			Confirm Password: <input type="password"><br>
+		</fieldset>
+		<fieldset class="sub_set">
+		<legend>Misc</legend>
+			Firefighter ID: <input type="text" value="GOU9716" disabled><br>
+			Status: <input type="text" value="Pending" disabled ><br>
+			Jurisdiction: <select>
+				<option>City of Fairbanks FD</option>
+				<option>North Pole FD</option>
+				<option>Chignik Bay VFD</option>
+				<option>Sitka FD</option>
+				<option>Ketchikan FD</option>
+				<option>Central Mat-Su FD</option>
+				<option>Division of Fire and Life Safety</option>
+				<option>Anchorage FD</option>
+			</select>
+		</fieldset>
+		<input id="form_submit_button" type="submit" value="update">
+	</fieldset>
+	
+</form>
+
+</body>
+</html>

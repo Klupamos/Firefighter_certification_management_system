@@ -1,0 +1,20 @@
+{% extends "base_template.djt" %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+{% if invalid_login %}
+<div><p style="color:red">{{ invalid_login }}<p></div>
+{% endif %}  
+<form action="{{ path }}" method="POST">
+    <fieldset style="width: 250px">
+        <legend>Login:</legend>
+        Username: <input name="username" type="text"><br>
+        Password: <input name="password" type="password"><br>
+        {% csrf_token %}
+        <input type="submit">
+    </fieldset>
+</form>
+{%endblock %}

@@ -1,0 +1,9 @@
+{% extends "base_template.djt" %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+<h1>Account creation form here</h1>
+{%endblock %}

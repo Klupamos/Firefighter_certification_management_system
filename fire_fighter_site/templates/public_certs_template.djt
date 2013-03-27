@@ -1,0 +1,11 @@
+{% extends "base_template.djt" %}
+
+{% block head %}
+<script>
+// md5hash()
+</script>
+{% endblock %}
+
+{% block content %}
+<h1>All certificates and requiremnts</h1>
+{%endblock %}
