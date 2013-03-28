@@ -1,0 +1,6 @@
+{% extends "base_template.djt" %}
+
+
+{% block content %}
+<h1>My certificates and requirements</h1>
+{%endblock %}

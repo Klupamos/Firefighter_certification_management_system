@@ -1,0 +1,26 @@
+<html>
+	<head>
+		<link rel="stylesheet" type"text/css" href="static/default.css" />
+		{% block head %}{% endblock %}
+	</head>
+	<body>
+		<div class='navigation'>
+			{% block navigation %}
+				{% if nav_links %}
+					<ul>
+						{% for link in nav_links %}
+							<li><a href='{{ link.href }}'>{{ link.text }}</a></li>
+						{% endfor %}
+					</ul>
+				{% else %}
+					<h1> ADD 'nav_links' TO TEMPLATE CONTEXT </h1>
+				{% endif %}
+			{% endblock %}
+		</div>
+		<div class='content'>
+			{% block content %}
+				<h1> ADD 'content' BLOCK TO TEMPLATE</h1>
+			{% endblock %}
+		</div>
+	</body>
+<html>

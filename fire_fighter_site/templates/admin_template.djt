@@ -1,0 +1,11 @@
+{% extends "base_template.djt" %}
+
+{% block head %}
+<script>
+// md5hash()
+</script>
+{% endblock %}
+
+{% block content %}
+<h1>Administrator Control Panel</h1>
+{%endblock %}

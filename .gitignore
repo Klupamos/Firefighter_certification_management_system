@@ -16,6 +16,9 @@ develop-eggs
 lib
 lib64
 
+# Compiled python files
+*.pyc
+
 # Compiled Object files
 *.slo
 *.lo

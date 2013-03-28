@@ -1,0 +1,55 @@
+@media screen{
+	body{
+		margin:  0px;
+		padding: 0px;
+		background-image:  url("/static/images/navigation_space.jpg");
+	background-repeat: repeat-y;
+	}
+
+/* CSS regulating all elements in the navigation bar */
+	div.navigation{
+		position: absolute;
+		margin:   0px;
+		padding:  0px;
+		width:    200px;
+	}
+	
+	div.navigation ul{
+		margin:  0px 0px 0px 0px;
+		padding: 0px 0px 0px 10px;
+		list-style-type: none;
+		text-align: left;
+	}
+	
+	div.navigation li{
+		margin: 5px;
+		font-weight: bold;
+	}
+	
+	div.navigation a{
+		color: orange;
+		text-decoration: none;
+		text-transform:  uppercase;
+	}
+
+	div.navigation a:hover{
+		color: red;
+	}
+	
+	/* CSS regulating all other elements */
+	div.content{
+		position: absolute;
+		left: 200px;
+		margin: 0px 0px 0px 20px;
+	}
+}
+
+@media print{
+	div.navigation{
+		display: none;
+	}
+	
+	div.content{
+		left: 0px;
+	}
+}
