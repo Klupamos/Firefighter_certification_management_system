@@ -1,5 +1,10 @@
 <html>
 <style>
+body {
+background-image:url("./Untitled-4.jpg");
+background-repeat:no-repeat;
+background-position:center;
+}
 .sub_set{
 	float: left;
 	width: 300px;
@@ -41,13 +46,18 @@ input{
 	color: red;
 }
 
+.Left_Nav a.cur{
+	background-color: green;
+}
+
+
 </style>
 <body>
 
 <div class="Left_Nav">
 <ul>
 	<li><a href="./Login.html">Login</a></li>
-	<li><a href="./Account_Creation.html">Create Account</a></li>
+	<li><a class="cur" href="./Account_Creation.html">Create Account</a></li>
 	<li><a href="./Certification_Definitions.html">Certification Table</a></li>
 </ul>
 </div>
