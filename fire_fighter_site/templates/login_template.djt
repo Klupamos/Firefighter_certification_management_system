@@ -1,9 +1,7 @@
 {% extends "base_template.djt" %}
 
 {% block head %}
-<script>
-// md5hash()
-</script>
+
 {% endblock %}
 
 {% block content %}
