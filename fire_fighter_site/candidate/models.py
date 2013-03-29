@@ -64,6 +64,14 @@ class Candidate(models.Model):
     def __unicode__(self):
         return " ".join(filter(None, (self.first_name, self.middle_initial, self.last_name, self.suffix)))
     
+    def save(self, *args, **kwargs):
+        if (not self.fire_fighter_ID):
+            self.fire_fighter_ID = self.__unicode__()[0:9]
+            super(Candidate, self).save(*args, **kwargs)
+            self.fire_fighter_ID = self.last_name[0:4] + str(self.id)[-4:].zfill(4)
+        super(Candidate, self).save(*args, **kwargs)
+
+    
     class Meta:
         ordering = ["last_name", "first_name"]
         unique_together = ('first_name','middle_initial','last_name','suffix')

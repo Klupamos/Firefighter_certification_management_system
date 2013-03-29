@@ -1,0 +1,33 @@
+@media screen{
+
+    ul.login_list{
+        list-style-type: none;
+        padding: 0px;
+        margin:  0px;
+    }
+    
+    ul.login_list li{
+        width:400px;
+        padding: 0px;
+        margin:  0px;
+                vertical-align:middle;
+    }
+    
+    ul.login_list li label{
+        width: 150px;
+        text-align:left;
+        display:block;
+        float:left;
+    }
+   
+    ul.login_list li input,select{
+        width: 250px;
+    }
+   
+    ul.login_list li input[type="submit"]{
+        display:block;
+        width: 75px;
+        margin-left:auto;
+        margin-right:auto;
+    }
+}
