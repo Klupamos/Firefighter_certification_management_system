@@ -18,5 +18,5 @@ def create_navlinks(user):
         nav_links.append(anchor("/public_certs", "view certificates"))
         nav_links.append(anchor("/logout", "logout"))
     else:
-        nav_links.extend([anchor("/login", "login"), anchor("/create", "create account"), anchor("/public_certs", "view certificates")])
+        nav_links.extend([anchor("/login", "login"), anchor("/candidate_registration", "Account Registration"), anchor("/public_certs", "view certificates")])
     return nav_links

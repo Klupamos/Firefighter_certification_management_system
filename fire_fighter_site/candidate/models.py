@@ -132,10 +132,11 @@ class RequirementForm(ModelForm):
         model = Requirement
 
 
-class UserForm(ModelForm):
+class UserLoginForm(ModelForm):
     class Meta:
         model = User
-
+        fields = ('username', 'password',)
+        
 class NewCandidateForm(ModelForm):
     class Meta:
         model = Candidate
