@@ -1,6 +1,6 @@
 # C Extensions
 *.so
-
+*.pyc
 # Packages
 *.egg
 *.egg-info
