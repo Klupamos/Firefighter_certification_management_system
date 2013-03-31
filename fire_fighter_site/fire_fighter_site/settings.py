@@ -157,3 +157,5 @@ LOGGING = {
         },
     }
 }
+
+AUTH_USER_MODEL = 'candidate.models'
