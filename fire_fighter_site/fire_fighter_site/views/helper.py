@@ -9,11 +9,11 @@ def create_navlinks(user):
     if user.is_authenticated():
         nav_links.append(anchor("/account_info","Account Information"))
         nav_links.append(anchor("/account_certs", "Account Certificates"))
-        if user.username == 'train':
+        if user.is_training_officer():
             nav_links.append(anchor("/training", "Training Officer"))
-        if user.username == 'certify':
+        if user.is_certifying_officer():
             nav_links.append(anchor("/certifying", "Certifying Officer"))
-        if user.username == 'admin':
+        if user.is_administrator():
             nav_links.append(anchor("/admin", "Administration"))
         nav_links.append(anchor("/public_certs", "view certificates"))
         nav_links.append(anchor("/logout", "logout"))

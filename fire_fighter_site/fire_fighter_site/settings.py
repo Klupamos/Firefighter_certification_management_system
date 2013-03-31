@@ -158,4 +158,4 @@ LOGGING = {
     }
 }
 
-AUTH_USER_MODEL = 'candidate.models'
+AUTH_USER_MODEL = 'candidate.Candidate'

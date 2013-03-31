@@ -5,7 +5,8 @@ from django.shortcuts import render_to_response, redirect
 from django.core.context_processors import csrf
 
 from fire_fighter_site.views.helper import create_navlinks
-from candidate.models import Candidate, NewCandidateForm
+from candidate.models import Candidate
+from candidate.forms import NewCandidateForm
 
 def display(request):
 

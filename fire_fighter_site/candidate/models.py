@@ -31,15 +31,15 @@ class Requirement(models.Model):
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 class CandidateManager(BaseUserManager):
-    def create_user(self, username, password, firstname, lastname, street_addr, city, postal, state):
+    def create_user(self, username, password, firstname, lastname, street, city, postal, state):
         if not username:
             raise ValueError('User must have a username')
-            
-        user = self.Model(
+           
+        user = self.model(
             user_name = username,
             first_name = firstname,
             last_name = lastname,
-            street_address = street_addr,
+            street_address = street,
             city_name = city,
             postal_code = postal,
             state_abrv = state,
@@ -48,13 +48,23 @@ class CandidateManager(BaseUserManager):
         user.save(using=self._db)
         return user
     
-    def crate_superuser(self, *args):
-        user = self.create_user(*args)
+    def create_superuser(self, **kwargs):
+        user = self.create_user(
+            username  = kwargs['user_name'],
+            password  = kwargs['password'],
+            firstname = kwargs['first_name'],
+            lastname  = kwargs['last_name'],
+            street    = kwargs['street_address'],
+            city      = kwargs['city_name'],
+            postal    = kwargs['postal_code'],
+            state     = kwargs['state_abrv']
+        )
+        user.administrator_approved = True
         user.appoint_as_administrator()
         user.save(using=self._db)
         return user
  
- 
+from django.core.exceptions import ObjectDoesNotExist
 class Candidate(AbstractBaseUser):
     # authentication
     user_name = models.CharField(max_length=40, unique=True, db_index=True)
@@ -62,20 +72,20 @@ class Candidate(AbstractBaseUser):
     
     # name
     first_name = models.CharField(max_length=50)
-    middle_initial = models.CharField(max_length=1, blank=True)
+    middle_initial = models.CharField(max_length=1, blank=True, default='')
     last_name = models.CharField(max_length=50)
-    suffix = models.CharField(max_length=4, blank=True)
+    suffix = models.CharField(max_length=4, blank=True, default='')
 
     # contact
-    phone_number = models.IntegerField(max_length=14, blank=True) # (###)-###-#### ext: ####
-    email_address = models.EmailField(max_length=254, blank=True)
+    phone_number = models.IntegerField(max_length=14, null=True) # (###)-###-#### ext: ####
+    email_address = models.EmailField(max_length=254, blank=True, default='')
     street_address = models.CharField(max_length=50)
     city_name = models.CharField(max_length=25)
     postal_code = models.CharField(max_length=10)
     state_abrv = models.CharField(max_length=20, default='AK')
 
     #foreign keys
-    jurisdiction = models.ForeignKey('Jurisdiction', related_name='candidate_list')
+    jurisdiction = models.ForeignKey('Jurisdiction', related_name='candidate_list', null=True)
     certifications = models.ManyToManyField(Certification, through='candidate_earned_certification')
     requirements = models.ManyToManyField(Requirement, through='candidate_earned_requirement')
 
@@ -84,7 +94,6 @@ class Candidate(AbstractBaseUser):
     REQUIRED_FIELDS = ['first_name', 'last_name', 'street_address', 'city_name', 'postal_code', 'state_abrv']
     is_active = models.BooleanField(default=True)
     administrator_approved = models.BooleanField(default=False)
-    
     objects = CandidateManager()
 
     class Meta:
@@ -98,7 +107,7 @@ class Candidate(AbstractBaseUser):
         return self.first_name
         
     def get_firefighter_id(self):
-        return self.lastname[0:4] + str(self.id).zfill(4)[-4:]
+        return self.last_name[0:4] + str(self.id).zfill(4)[-4:]
     
     def __unicode__(self):
         return self.get_firefighter_id()
@@ -117,26 +126,26 @@ class Candidate(AbstractBaseUser):
             
     def is_administrator(self):
         try:
-            onj = Administrators.object.get(id=self.id)
+            admin = Administrators.objects.get(candidate = self)
             return True
-        except django.core.exceptions.ObjectDoesNotExist:
+        except ObjectDoesNotExist:
             return False
             
     def appoint_as_administrator(self):
-        raise NotImplementedError()
+        admin = Administrators.objects.get_or_create(candidate = self)
         
     def revoke_administrator(self):
         raise NotImplementedError()
 
         
 class candidate_earned_certification(models.Model):
-    candidate = models.ForeignKey(settings.AUTH_USER_MODEL, primary_key=True)
+    candidate = models.ForeignKey(Candidate, primary_key=True)
     certifications = models.ForeignKey(Certification)
     date = models.DateField()
 
     
 class candidate_earned_requirement(models.Model):
-    candidate = models.ForeignKey(settings.AUTH_USER_MODEL, primary_key=True)
+    candidate = models.ForeignKey(Candidate, primary_key=True)
     requirements = models.ForeignKey(Requirement)
     date = models.DateField(auto_now_add=True)
     expiration_date = models.DateField(null=True)
@@ -150,8 +159,8 @@ class candidate_earned_requirement(models.Model):
     
 class Jurisdiction(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    training_officer = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='trains_jurisdiction')
-    certifying_officer = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='certifies_jurisdiction')
+    training_officer = models.ManyToManyField(Candidate, related_name='trains_jurisdiction')
+    certifying_officer = models.ManyToManyField(Candidate, related_name='certifies_jurisdiction')
 
     class Meta:
         ordering  = ["name"] 
@@ -173,7 +182,7 @@ class Jurisdiction(models.Model):
 
         
 class Transfer_Request(models.Model):
-    candidate    = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='transfer_request', unique=True)
+    candidate    = models.ForeignKey(Candidate, related_name='transfer_request', unique=True)
     jurisdiction = models.ForeignKey(Jurisdiction, related_name='requested_transfers', primary_key=True)
     TO_approval  = models.BooleanField(default=False)
 
@@ -185,4 +194,4 @@ class Transfer_Request(models.Model):
 
 
 class Administrators(models.Model):
-    candidate = models.ForeignKey(settings.AUTH_USER_MODEL, primary_key=True, unique=True)
+    candidate = models.ForeignKey(Candidate, primary_key=True, unique=True)

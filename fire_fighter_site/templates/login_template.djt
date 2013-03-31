@@ -7,7 +7,11 @@
 {% block content %}
 
 {% if invalid_login %}
-<div><p style="color:red">{{ invalid_login }}<p></div>
+<div>
+{% for x in invalid_login %}
+<p style="color:red">{{ x }}<p>
+{% endfor %}
+</div>
 {% endif %}  
 <form action="{{ path }}" method="POST" id="login_form">
 {% csrf_token %}

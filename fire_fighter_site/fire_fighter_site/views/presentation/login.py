@@ -7,7 +7,8 @@ from django.contrib import auth
 from django.core.context_processors import csrf
 
 from fire_fighter_site.views.helper import create_navlinks
-from candidate.models import User, UserLoginForm
+from candidate.models import Candidate
+from candidate.forms import UserLoginForm
 
 
 def display(request):
@@ -15,15 +16,15 @@ def display(request):
     if (request.user.is_authenticated()):
         return redirect('/account_info')
     
-    errors = None
+    errors = []
     user = None
     if (request.method == 'POST'): 
-        u = UserLoginForm(request.POST)
-        if u.is_valid():
-            user_record = u.save(commit=False)#create a user record but don't save it to the database
-            user = auth.authenticate(username=user_record.username, password=user_record.password)
-        else:
-            errors = u.errors
+        user_record = UserLoginForm(request.POST)
+        errors.append(user_record)
+        if user_record.is_valid():
+            user = auth.authenticate(username=user_record.user_name, password=user_record.password)
+        #else:
+            #errors.extend(user_record.errors)
     
     if user is not None and user.is_active:
         auth.login(request, user)
