@@ -1,8 +1,12 @@
 # Django settings for fire_fighter_site project.
 import os.path
+import ConfigParser
 
+config = ConfigParser.ConfigParser()
+config.read('fire_fighter_site.cfg')
 
-DEBUG = True
+DEBUG = config.getboolean('Other','debug')
+
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -11,15 +15,17 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(os.path.dirname(os.path.dirname(__file__)), 'database' ,  'db.sqlite3').replace('\\','/'),                      # Or path to database file if using sqlite3.
+        'NAME': config.get('Database','Name',0), #os.path.join(os.path.dirname(os.path.dirname(__file__)), 'database' ,  'db.sqlite3').replace('\\','/'),                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '',                      # Set to empty string for default.
+        'USER': config.get('Database','User',0),
+        'PASSWORD': config.get('Database','Pass',0),
+        'HOST': config.get('Database','Host',0),                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'PORT': config.get('Database','Port',0),                      # Set to empty string for default.
     }
 }
 
@@ -31,13 +37,13 @@ ALLOWED_HOSTS = []
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
-TIME_ZONE = 'America/Anchorage'
+TIME_ZONE = config.get('Other','TimeZone',0)
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
 
-SITE_ID = 1
+SITE_ID = config.get('Other','Site_ID',0)
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -86,7 +92,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '86c*_=^%(56-ur2$$ov1fn7)b$5sjg&hz8q5ki!%efdn9_89in'
+SECRET_KEY = config.get('Other','Secret_key',1)
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
