@@ -42,6 +42,11 @@
 		left: 200px;
 		margin: 20px;
 	}
+    
+    .required label:after{
+        color:red;
+        content:"*";
+    }
 }
 
 @media print{

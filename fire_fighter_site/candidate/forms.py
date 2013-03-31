@@ -15,16 +15,34 @@ class RequirementForm(ModelForm):
         model = Requirement
 
 
-class UserLoginForm(ModelForm):
+class CandidateLoginForm(ModelForm):
     class Meta:
         model = get_user_model()
         fields = ('user_name', 'password',)
-        
+        widgets = {
+            'password': forms.PasswordInput(),
+        }
         
 class NewCandidateForm(ModelForm):
+    required_css_class='required'
     class Meta:
         model = get_user_model()
-        exclude = ('fire_fighter_ID', 'certifications', 'requirements',)
+        fields = (
+            'user_name',
+            'password',
+            'first_name',
+            'middle_initial',
+            'last_name',
+            'suffix',
+            'phone_number',
+            'email_address',
+            'street_address',
+            'city_name',
+            'postal_code',
+            'state_abrv',
+            'jurisdiction',
+        )
+
 
         
 class UpdateCandidateForm(ModelForm):

@@ -107,7 +107,7 @@ class Candidate(AbstractBaseUser):
         return self.first_name
         
     def get_firefighter_id(self):
-        return self.last_name[0:4] + str(self.id).zfill(4)[-4:]
+        return self.last_name[0:4].upper() + str(self.id).zfill(4)[-4:]
     
     def __unicode__(self):
         return self.get_firefighter_id()
