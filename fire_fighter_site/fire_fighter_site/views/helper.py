@@ -1,22 +1,34 @@
+import ConfigParser
+from django.conf import settings
+
 class anchor(object):
-    def __init__(self, href, text):
+    def __init__(self, text, href):
         self.href = href
         self.text = text
 
 def create_navlinks(user):
+    config = ConfigParser.RawConfigParser()
+    config.read(settings.CONFIG_FILE)
+    
     nav_links = []
-    # Note these hardcoded if statments need to be changed out for permissions
+    
     if user.is_authenticated():
-        nav_links.append(anchor("/account_info","Account Information"))
-        nav_links.append(anchor("/account_certs", "Account Certificates"))
+        for a in config.items('Candidate URLs'):
+            nav_links.append(anchor(a[0], a[1]))
+                
         if user.is_training_officer():
-            nav_links.append(anchor("/training", "Training Officer"))
+            for a in config.items('Training Officer URLs'):
+                nav_links.append(anchor(a[0], a[1]))
         if user.is_certifying_officer():
-            nav_links.append(anchor("/certifying", "Certifying Officer"))
+            for a in config.items('Certifying Officer URLs'):
+                nav_links.append(anchor(a[0], a[1]))
         if user.is_administrator():
-            nav_links.append(anchor("/admin", "Administration"))
-        nav_links.append(anchor("/public_certs", "view certificates"))
-        nav_links.append(anchor("/logout", "logout"))
+            for a in config.items('Administration URLs'):
+                nav_links.append(anchor(a[0], a[1]))
     else:
-        nav_links.extend([anchor("/login", "login"), anchor("/candidate_registration", "Account Registration"), anchor("/public_certs", "view certificates")])
+        for a in config.items('Anonymous URLs'):
+            nav_links.append(anchor(a[0], a[1]))
+    
+    for a in config.items('Everyone URLs'):
+        nav_links.append(anchor(a[0], a[1]))
     return nav_links

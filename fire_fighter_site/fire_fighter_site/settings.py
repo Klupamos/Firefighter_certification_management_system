@@ -2,8 +2,10 @@
 import os.path
 import ConfigParser
 
+CONFIG_FILE = 'fire_fighter_site.cfg'
+
 config = ConfigParser.ConfigParser()
-config.read('fire_fighter_site.cfg')
+config.read(CONFIG_FILE)
 
 DEBUG = config.getboolean('Other','debug')
 
