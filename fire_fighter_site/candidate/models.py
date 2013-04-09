@@ -85,8 +85,9 @@ class Candidate(AbstractBaseUser):
 
     #foreign keys
     jurisdiction = models.ForeignKey('Jurisdiction', related_name='candidate_list', null=True)
-    certifications = models.ManyToManyField(Certification, through='candidate_earned_certification')
-    requirements = models.ManyToManyField(Requirement, through='candidate_earned_requirement')
+    processing_certifications = models.ManyToManyField(Certification, through='certification_processing')
+    earned_certifications = models.ManyToManyField(Certification, through='candidate_earned_certification')
+    earned_requirements = models.ManyToManyField(Requirement, through='candidate_earned_requirement')
 
     #required by AbstractBaseUser class
     USERNAME_FIELD = 'email_address'
@@ -136,10 +137,14 @@ class Candidate(AbstractBaseUser):
     def revoke_administrator(self):
         raise NotImplementedError()
 
+class certification_processing(models.Model):
+    candidate = models.ForeignKey(Candidate, primary_key=True)
+    certification = models.ForeignKey(Certification)
+    
         
 class candidate_earned_certification(models.Model):
     candidate = models.ForeignKey(Candidate, primary_key=True)
-    certifications = models.ForeignKey(Certification)
+    certification = models.ForeignKey(Certification)
     date = models.DateField()
 
     
@@ -181,8 +186,8 @@ class Jurisdiction(models.Model):
 
         
 class Transfer_Request(models.Model):
-    candidate    = models.ForeignKey(Candidate, related_name='transfer_request', unique=True)
     jurisdiction = models.ForeignKey(Jurisdiction, related_name='requested_transfers', primary_key=True)
+    candidate    = models.ForeignKey(Candidate, related_name='transfer_request', unique=True)
     TO_approval  = models.BooleanField(default=False)
 
     def __unicode__(self):
