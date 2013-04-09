@@ -18,7 +18,7 @@ def display(request):
     
     errors = []
     if (request.method == 'POST'):
-        user = auth.authenticate(username=request.POST.get('user_name',''), password=request.POST.get('password',''))
+        user = auth.authenticate(username=request.POST.get('email_address',''), password=request.POST.get('password',''))
 
         if user is not None and user.is_active:
             auth.login(request, user)

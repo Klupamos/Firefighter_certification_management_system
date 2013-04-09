@@ -4,6 +4,7 @@ import ConfigParser
 
 CONFIG_FILE = 'fire_fighter_site.cfg'
 
+#Why is this neccisary again?
 config = ConfigParser.ConfigParser()
 config.read(CONFIG_FILE)
 
@@ -16,8 +17,6 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
-
-
 
 DATABASES = {
     'default': {

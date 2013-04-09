@@ -1,0 +1,6 @@
+{% block ajax_data %}
+
+<pre>
+{{user}}
+</pre>
+{% endblock %}

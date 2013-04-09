@@ -1,5 +1,7 @@
 import ConfigParser
+from django.conf import settings 
 
+settings.configure()
 config = ConfigParser.RawConfigParser()
 
 # When adding sections or items, add them in the reverse order of
@@ -24,8 +26,6 @@ config.set('Other','Site_ID','1')
 config.set('Other','Secret_key','86c*_=^%(56-ur2$$ov1fn7)b$5sjg&hz8q5ki!%efdn9_8') # should this be rand()
 
 
-config.add_section('Everyone URLs')
-config.set('Everyone URLs', 'View Certificates', '/public_certs')
 
 config.add_section('Anonymous URLs')
 config.set('Anonymous URLs', 'Login', '/login')
@@ -45,7 +45,9 @@ config.set('Certifying Officer URLs', 'Certifying Officer', '/certifying')
 config.add_section('Administration URLs')
 config.set('Administration URLs', 'Administration', '/admin')
 
+config.add_section('Everyone URLs')
+config.set('Everyone URLs', 'View Certificates', '/public_certs')
 
 # Writing our configuration file to 'example.cfg'
-with open(SETTINGS.config_file, 'wb') as configfile:
+with open(settings.CONFIG_FILE, 'wb') as configfile:
     config.write(configfile)

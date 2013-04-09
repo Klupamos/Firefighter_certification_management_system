@@ -18,9 +18,9 @@ def display(request):
     if (request.method == 'POST'):
         f = NewCandidateForm(request.POST)
         if f.is_valid():
-            submited_candidate = f.save(commit=False)
-            submited_candidate.set_password(f.cleaned_data['password'])
-            submited_candidate.save()
+            submited_candidate = f.save(commit=False) # get a candidate object without saving to the database
+            submited_candidate.set_password(f.cleaned_data['password']) # hash and set the supplied password
+            submited_candidate.save()   # Now save to the database
             auth.login(request, submited_candidate)
         else:
             errors = f.errors

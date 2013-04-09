@@ -67,7 +67,7 @@ class CandidateManager(BaseUserManager):
 from django.core.exceptions import ObjectDoesNotExist
 class Candidate(AbstractBaseUser):
     # authentication
-    user_name = models.CharField(max_length=40, unique=True, db_index=True)
+    email_address = models.EmailField(max_length=254, unique=True, db_index=True)
     #password added by AbstractBaseUSer
     
     # name
@@ -78,7 +78,6 @@ class Candidate(AbstractBaseUser):
 
     # contact
     phone_number = models.IntegerField(max_length=14, null=True) # (###)-###-#### ext: ####
-    email_address = models.EmailField(max_length=254, blank=True, default='')
     street_address = models.CharField(max_length=50)
     city_name = models.CharField(max_length=25)
     postal_code = models.CharField(max_length=10)
@@ -90,7 +89,7 @@ class Candidate(AbstractBaseUser):
     requirements = models.ManyToManyField(Requirement, through='candidate_earned_requirement')
 
     #required by AbstractBaseUser class
-    USERNAME_FIELD = 'user_name'
+    USERNAME_FIELD = 'email_address'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'street_address', 'city_name', 'postal_code', 'state_abrv']
     is_active = models.BooleanField(default=True)
     administrator_approved = models.BooleanField(default=False)
