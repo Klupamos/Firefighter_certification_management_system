@@ -31,12 +31,12 @@ class Requirement(models.Model):
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 class CandidateManager(BaseUserManager):
-    def create_user(self, username, password, firstname, lastname, street, city, postal, state):
-        if not username:
+    def create_user(self, emailaddress, password, firstname, lastname, street, city, postal, state):
+        if not emailaddress:
             raise ValueError('User must have a username')
            
         user = self.model(
-            user_name = username,
+            email_address = emailaddress,
             first_name = firstname,
             last_name = lastname,
             street_address = street,
@@ -50,7 +50,7 @@ class CandidateManager(BaseUserManager):
     
     def create_superuser(self, **kwargs):
         user = self.create_user(
-            username  = kwargs['user_name'],
+            email_address  = kwargs['email_address'],
             password  = kwargs['password'],
             firstname = kwargs['first_name'],
             lastname  = kwargs['last_name'],
@@ -85,7 +85,6 @@ class Candidate(AbstractBaseUser):
 
     #foreign keys
     jurisdiction = models.ForeignKey('Jurisdiction', related_name='candidate_list', null=True)
-    processing_certifications = models.ManyToManyField(Certification, through='certification_processing')
     earned_certifications = models.ManyToManyField(Certification, through='candidate_earned_certification')
     earned_requirements = models.ManyToManyField(Requirement, through='candidate_earned_requirement')
 
@@ -137,10 +136,7 @@ class Candidate(AbstractBaseUser):
     def revoke_administrator(self):
         raise NotImplementedError()
 
-class certification_processing(models.Model):
-    candidate = models.ForeignKey(Candidate, primary_key=True)
-    certification = models.ForeignKey(Certification)
-    
+
         
 class candidate_earned_certification(models.Model):
     candidate = models.ForeignKey(Candidate, primary_key=True)
