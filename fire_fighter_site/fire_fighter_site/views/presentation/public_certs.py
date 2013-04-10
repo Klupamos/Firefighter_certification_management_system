@@ -3,6 +3,7 @@ from django.template.loader import get_template
 from django.shortcuts import render_to_response, redirect
 
 from fire_fighter_site.views.helper import create_navlinks
+from candidate.models import Candidate
 
 def display(request):
     nav_links = create_navlinks(request.user)

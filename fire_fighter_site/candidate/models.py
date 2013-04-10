@@ -11,7 +11,6 @@ class Certification(models.Model):
     description = models.CharField(max_length=1000)
     requirements = models.ManyToManyField('Requirement', related_name='certifications')
     months_valid = models.IntegerField(default=0) #number of months this certification is valid. 0 for never
-
     def __unicode__(self):
         return self.name
     
