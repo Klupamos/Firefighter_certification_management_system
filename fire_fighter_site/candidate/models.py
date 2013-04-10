@@ -3,7 +3,6 @@ from django.conf import settings
 
 ##### TO DO #####
 #1. Change ER diagram to allow forign key refence between Jurisdiction and User in terms of TA/CO
-#3. Need to finish form generating classes
 
 
 class Certification(models.Model):
@@ -18,6 +17,9 @@ class Certification(models.Model):
     class Meta:
         ordering = ["name"]
     
+    def Add_Requirement(self, req):
+        self.requirements.add(req)
+        self.save()
 
 class Requirement(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -98,7 +100,8 @@ class Candidate(AbstractBaseUser):
     class Meta:
         ordering = ["last_name", "first_name"]
         unique_together = ('first_name','middle_initial','last_name','suffix')
-        
+    
+#class methods     
     def get_full_name(self): # defined in AbstractBaseUser
         return " ".join(filter(None, (self.first_name, self.middle_initial, self.last_name, self.suffix)))
     
@@ -130,13 +133,31 @@ class Candidate(AbstractBaseUser):
         except ObjectDoesNotExist:
             return False
             
-    def appoint_as_administrator(self):
+    def Appoint_As_Administrator(self):
         admin = Administrators.objects.get_or_create(candidate = self)
         
-    def revoke_administrator(self):
-        raise NotImplementedError()
-
-
+    def Revoke_Administrator(self):
+        try:
+            Administrators.objects.get(candidate = self).delete()
+        except ObjectDoesNotExist:
+            pass
+            
+    def Retire(self):
+        self.is_active = False
+        self.save()
+        
+    def Activate(self):
+        self.is_active = True
+        self.save()
+        
+    def Earned_Requirement(self, req):
+        self.earned_requirements.add(req)
+        self.save()
+        
+    def Earned_Certification(self, cert):
+        self.earned_certifications.add(cert)
+        self.save()
+        
         
 class candidate_earned_certification(models.Model):
     candidate = models.ForeignKey(Candidate, primary_key=True)
@@ -168,17 +189,18 @@ class Jurisdiction(models.Model):
     def __unicode__(self):
         return self.name   
     
+#class methods    
     def appoint_training_officer(self, candidate):
-        raise NotImplementedError()
+        self.training_officer.add(candidate)
         
     def revoke_training_officer(self, candidate):
-        raise NotImplementedError()
+        self.training_officer.remove(candidate)
         
     def appoint_certifying_officer(self, candidate):
-        raise NotImplementedError()
+        self.certifying_officer.add(candidate)
         
     def revoke_certifying_officer(self, candidate):
-        raise NotImplementedError()
+        self.certifying_officer.remove(candidate)
 
         
 class Transfer_Request(models.Model):
@@ -187,11 +209,19 @@ class Transfer_Request(models.Model):
     TO_approval  = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return self.name
+        return str(candidate) + " => " + str(jurisdiction) 
     
     class Meta:
         order_with_respect_to = 'candidate'
 
+#class methods
+    def Training_Approval(self):
+        self.TO_approval = True
+        self.save()
+    
+    def Admin_Authorize(self):
+        self.candidate.jurisdiction = self.jurisdiction
+        self.delete()
 
 class Administrators(models.Model):
     candidate = models.ForeignKey(Candidate, primary_key=True, unique=True)
