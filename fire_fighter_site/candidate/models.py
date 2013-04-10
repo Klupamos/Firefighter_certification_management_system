@@ -15,7 +15,7 @@ class Certification(models.Model):
     
     class Meta:
         ordering = ["name"]
-    
+
     def Add_Requirement(self, req):
         self.requirements.add(req)
         self.save()
