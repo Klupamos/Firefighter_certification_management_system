@@ -10,6 +10,7 @@
 
 {% block content %}
 <h1>Earned</h1>
+{% if full_cert %}
 {% for cert in full_cert %}
 <div>
 	<h3 style="color:red;">{{ cert.name }}</h3>
@@ -21,8 +22,13 @@
 	</ul>
 </div>
 {% endfor %}
+{% else %}
+<h5> No certs earned yet </h5>
+{% endif %}
+
 
 <h1>Partial Earned</h1>
+{% if part_cert %}
 {% for cert in part_cert %}
 <div>
 	<h3>{{ cert.name }}</h3>
@@ -34,8 +40,12 @@
 	</ul>
 </div>
 {% endfor %}
+{% else %}
+<h5>No partial earned certificates earned yet</h5>
+{% endif %}
 
 <h1>Not Earned</h1>
+{% if none_cert %}
 {% for cert in none_cert %}
 <div>
 	<h3>{{ cert.name }}</h3>
@@ -47,5 +57,6 @@
 	</ul>
 </div>
 {% endfor %}
-
+{% else %}
+{% endif %}
 {%endblock %}

@@ -7,6 +7,6 @@ Abstract:
 
 Authors:
 	Greg Kluapr
-	Robert Houlding
+	Robert Hartshorn
 	Zak Williams
 	Ryan Houlding

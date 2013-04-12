@@ -99,7 +99,7 @@ class Candidate(AbstractBaseUser):
 
     class Meta:
         ordering = ["last_name", "first_name"]
-        unique_together = ('first_name','middle_initial','last_name','suffix')
+        #unique_together = ('first_name','middle_initial','last_name','suffix')
     
 #class methods     
     def get_full_name(self): # defined in AbstractBaseUser
@@ -171,7 +171,7 @@ class Candidate(AbstractBaseUser):
                 candidate_earned_requirement.objects.filter(candidate = self).filter(requirement = r).delete()
         
 class candidate_earned_certification(models.Model):
-    candidate = models.ForeignKey(Candidate, primary_key=True)
+    candidate = models.ForeignKey(Candidate) 
     certification = models.ForeignKey(Certification)
     date = models.DateField(auto_now_add=True)
     expiration_date = models.DateField(null=True)
@@ -183,7 +183,7 @@ class candidate_earned_certification(models.Model):
     company = models.CharField(max_length=20)
     
 class candidate_earned_requirement(models.Model):
-    candidate = models.ForeignKey(Candidate, primary_key=True)
+    candidate = models.ForeignKey(Candidate)
     requirement = models.ForeignKey(Requirement)
     date = models.DateField(auto_now_add=True)
 
