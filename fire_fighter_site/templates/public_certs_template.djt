@@ -9,23 +9,11 @@
 {% endblock %}
 
 {% block content %}
+{% if full_cert %}
 <h1>Earned</h1>
 {% for cert in full_cert %}
 <div>
 	<h3 style="color:red;">{{ cert.name }}</h3>
-    <h5>{{ cert.description }}</h5>
-    <ul>
-	{% for req in cert.requirements.all %}
-		<li {% if req %}style="color:red;"{%endif%} > {{req.name}} </li>
-	{% endfor %}
-	</ul>
-</div>
-{% endfor %}
-
-<h1>Partial Earned</h1>
-{% for cert in part_cert %}
-<div>
-	<h3>{{ cert.name }}</h3>
     <h5>{{ cert.description }}</h5>
     <ul>
 	{% for req in cert.requirements.all %}
@@ -34,7 +22,27 @@
 	</ul>
 </div>
 {% endfor %}
+{% endif %}
 
+{% if part_cert %}
+<h1>Partial Earned</h1>
+{% for cert in part_cert %}
+<div>
+	<h3>{{ cert.name }}</h3>
+    <h5>{{ cert.description }}</h5>
+    <ul>
+	{% for req in cert.requirements %}
+		<li  style="color:red;" > {{req.name}} </li>
+        {%if req.candidate_set %}
+        BLAAAAA
+        {% endif %}
+	{% endfor %}
+	</ul>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if none_cert %}
 <h1>Not Earned</h1>
 {% for cert in none_cert %}
 <div>
@@ -47,5 +55,6 @@
 	</ul>
 </div>
 {% endfor %}
+{% endif %}
 
 {%endblock %}

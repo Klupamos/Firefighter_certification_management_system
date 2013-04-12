@@ -1,6 +1,10 @@
 from django.db import models
 from django.conf import settings
 
+# for Candidate.(Add/Remove)_(Certification/Requirement)
+from django.db.models import Q
+from operator import __or__
+
 ##### TO DO #####
 #1. Change ER diagram to allow forign key refence between Jurisdiction and User in terms of TA/CO
 
@@ -16,11 +20,16 @@ class Certification(models.Model):
     
     class Meta:
         ordering = ["name"]
-
-    def Add_Requirement(self, req):
-        self.requirements.add(req)
+        
+    def Add_Requirements(self, *req_list):
+        self.requirements.add(*req_list)
         self.save()
 
+    def Add_Certifications(self, *cert_list):
+        cert_list.remove(self)
+        self.requirements.add(*cert_list)
+        self.save()
+        
 class Requirement(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
@@ -29,7 +38,6 @@ class Requirement(models.Model):
     
     class Meta:
         ordering = ["name"]
-
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 class CandidateManager(BaseUserManager):
@@ -101,7 +109,7 @@ class Candidate(AbstractBaseUser):
         ordering = ["last_name", "first_name"]
         unique_together = ('first_name','middle_initial','last_name','suffix')
     
-#class methods     
+#class methods
     def get_full_name(self): # defined in AbstractBaseUser
         return " ".join(filter(None, (self.first_name, self.middle_initial, self.last_name, self.suffix)))
     
@@ -114,64 +122,197 @@ class Candidate(AbstractBaseUser):
     def __unicode__(self):
         return self.get_firefighter_id()
     
-    def is_training_officer(self):
+    def Login(self):
+        raise 0
+        
+    def logout(self):
+        raise 0
+    
+    def Is_Authorized(self, permission_lvl):
+        perms = {}
+        perms['CD'] = lambda : self.Is_Candidate()
+        perms['TO'] = lambda : self.Is_Training_Officer()
+        perms['CO'] = lambda : self.Is_Certifying_Officer()
+        perms['AD'] = lambda : self.Is_Administrator()
+        try:
+            return perms[permission_lvl]()
+        except:
+            return False
+            
+    def Update_Fields(self, **fields):
+        raise 0
+
+    def Make_Candidate(self):
+        self.administrator_approved = True
+        
+    def Retire_Candidate(self):
+        self.administrator_approved = False
+        
+    def Is_Candidate(self):
+        return self.administrator_approved
+    
+    def Make_Training_Officer_of(self, jurisdiction):
+        jurisdiction.training_officer.add(self)
+        
+    def Retire_as_Training_Officer_of(self, jurisdiction):
+        jurisdiction.training_officer.remove(self)
+    
+    def Is_Training_Officer(self):
         if self.trains_jurisdiction.all():
             return True
         else:
-            return False
-            
-    def is_certifying_officer(self):
+            return False    
+    
+    def Make_Certifying_Officer_of(self, jurisdiction):
+        jurisdiction.training_officer.add(self)
+        
+    def Retire_Certifying_Officer_of(self, jurisdiction):
+        jurisdiction.training_officer.remove(self)
+        
+    def Is_Certifying_Officer(self):
         if self.certifies_jurisdiction.all():
             return True
         else:
             return False
-            
-    def is_administrator(self):
+    
+    def Make_Administrator(self):
+        admin = Administrators.objects.get_or_create(candidate = self)[0]
+        
+    def Retire_Administrator(self):
+        try:
+            Administrators.objects.get(candidate = self).delete()
+        except ObjectDoesNotExist:
+            pass
+
+    def Is_Administrator(self):
         try:
             admin = Administrators.objects.get(candidate = self)
             return True
         except ObjectDoesNotExist:
             return False
-            
-    def Appoint_As_Administrator(self):
-        admin = Administrators.objects.get_or_create(candidate = self)
         
-    def Revoke_Administrator(self):
-        try:
-            Administrators.objects.get(candidate = self).delete()
-        except ObjectDoesNotExist:
-            pass
-            
-    def Retire(self):
-        self.is_active = False
-        self.save()
+    def Request_Jurisdiction_Transfer(self, jurisdiction):
+        tr = Transfer_Request.objects.get_or_create(candidate = self)[0]
+        tr.jurisdiction = jurisdiction
+        tr.TO_approval = False
+        tr.save()
         
-    def Activate(self):
-        self.is_active = True
-        self.save()
-        
-    def Add_Requirement(self, req):
-        candidate_earned_requirement.objects.get_or_create(candidate = self, requirement = req)
-        
-    def Revoke_Requirement(self, req):
-        candidate_earned_requirement.objects.get_or_create(candidate = self, requirement = req)[0].delete()
-        
-        
-    def Add_Certification(self, cert):
-        candidate_earned_certification.objects.get_or_create(candidate = self, certification = cert)
-        for sub_cert in cert.certifications.all():
-            self.Add_Certification(sub_cert)
-        for req in cert.requirements.all():
-            self.Add_Requirement(req)
+    def Add_Requirements(self, *req_list):
+        if not req_list:
+            return
 
-    def Revoke_Certification(self, cert, remove_reqs = False):
-        candidate_earned_certification.objects.get_or_create(candidate = self, certification = cert)[0].delete()
-        if remove_reqs:
-            for r in cert.requirements.all():
-                candidate_earned_requirement.objects.filter(candidate = self).filter(requirement = r).delete()
+        print "Adding: ", req_list
+        for req in req_list:
+            candidate_earned_requirement.objects.get_or_create(candidate = self, requirement = req)
+        
+    def Remove_Requirements(self, *req_list, **kargs):
+        if not req_list:
+            return
+        
+        print "Removing: ", req_list
+        
+        super_cert_list = []
+        Q_filter = []
+        for req in req_list:
+            tmp = req.certifications.all()
+            if tmp:
+                super_cert_list.append(*tmp)
+            
+            Q_filter.append(Q(candidate = self, requirement = req))
+        
+        delete_list = candidate_earned_requirement.objects.filter(reduce(__or__, Q_filter))
+        
+        if kargs.get('bubble',True):
+            # I should also remove any Certifications that rely on these
+            self.Remove_Certifications(*super_cert_list)
+        
+        delete_list.delete()
+        
+    def List_Requirements(self):
+        return Requirement.objects.filter(candidate = self)
+        
+    def Add_Certifications(self, *cert_list, **cert_key_words):
+        if not cert_list:
+            return
+
+        sub_req_list = []
+        sub_cert_list = []
+        print "Adding: ", cert_list
+        for cert in cert_list:
+            cert_obj = candidate_earned_certification.objects.get_or_create(candidate = self, certification = cert)
+            if cert_obj[1] and cert_key_words:
+                cert_obj[0].expiration_date = cert_key_words.get('expiration_date',None)
+                cert_obj[0].IFSAC_date =    cert_key_words.get('IFSAC_date',None)
+                cert_obj[0].IFSAC_number =  cert_key_words.get('IFSAC_number',None)
+                cert_obj[0].PRO_date =      cert_key_words.get('PRO_date',None)
+                cert_obj[0].PRO_number =    cert_key_words.get('PRO_number',None)
+                cert_obj[0].company =       cert_key_words.get('company',None)
+                cert_obj[0].save()
+                
+            tmp = cert.requirements.all()
+            if tmp: 
+                sub_req_list.append(*tmp)
+                
+            tmp = cert.certifications.all()
+            if tmp: 
+                sub_cert_list.append(*tmp)
+                
+        self.Add_Certifications(*sub_cert_list)
+        self.Add_Requirements(*sub_req_list)
+        
+    def Remove_Certifications(self, *cert_list, **kargs):
+        if not cert_list:
+            return
+
+        print "Removing: ", cert_list
+        
+        super_cert_list = []
+        Q_filter = []
+        sub_req_list = []
+        sub_cert_list = []
+        for cert in cert_list:
+            tmp = cert.certifications.all()
+            if tmp:
+                super_cert_list.append(*tmp)
+            Q_filter.append(Q(candidate = self, certification = cert))
+        
+        delete_list = candidate_earned_certification.objects.filter(reduce(__or__, Q_filter))
+        
+        if kargs.get('cascade',False):
+            # I should Remove all requirements and certifications that make up the passed certifications
+
+            for ec in delete_list:
+                # Tally up requirements
+                tmp = ec.certification.requirements.all()
+                if tmp:
+                    sub_req_list.append(*tmp)
+                
+                # Tally up sub_certs
+                tmp = ec.certification.certifications.all()
+                if tmp:
+                    sub_cert_list.append(*tmp)
+                
+
+                
+        if kargs.get('bubble',True):
+            # I should also remove any Certifications that rely on these
+            self.Remove_Certifications(*super_cert_list)
+            
+        
+        # what is the best order to do this in?
+        delete_list.delete()
+        
+        if sub_cert_list:
+            self.Remove_Certifications(*sub_cert_list, cascade=True)
+        
+        if sub_req_list:
+            self.Remove_Requirements(*sub_req_list, bubble=kargs.get('bubble',True))
+
+    def List_Certifications(self):
+        return Certification.objects.filter(candidate = self)
         
 class candidate_earned_certification(models.Model):
-    candidate = models.ForeignKey(Candidate, primary_key=True)
+    candidate = models.ForeignKey(Candidate, primary_key=True, unique=False)
     certification = models.ForeignKey(Certification)
     date = models.DateField(auto_now_add=True)
     expiration_date = models.DateField(null=True)
@@ -186,9 +327,7 @@ class candidate_earned_requirement(models.Model):
     candidate = models.ForeignKey(Candidate, primary_key=True)
     requirement = models.ForeignKey(Requirement)
     date = models.DateField(auto_now_add=True)
-
-    
-    
+        
 class Jurisdiction(models.Model):
     name = models.CharField(max_length=50, unique=True)
     training_officer = models.ManyToManyField(Candidate, related_name='trains_jurisdiction')
@@ -213,7 +352,6 @@ class Jurisdiction(models.Model):
     def revoke_certifying_officer(self, candidate):
         self.certifying_officer.remove(candidate)
 
-        
 class Transfer_Request(models.Model):
     jurisdiction = models.ForeignKey(Jurisdiction, related_name='requested_transfers', primary_key=True)
     candidate    = models.ForeignKey(Candidate, related_name='transfer_request', unique=True)
@@ -226,13 +364,19 @@ class Transfer_Request(models.Model):
         order_with_respect_to = 'candidate'
 
 #class methods
-    def Training_Approval(self):
+    def Accept(self):
         self.TO_approval = True
         self.save()
     
-    def Admin_Authorize(self):
+    def Reject(slef):
+        raise 0
+    
+    def Approve(self):
         self.candidate.jurisdiction = self.jurisdiction
         self.delete()
 
+    def Disapprove(self):
+        raise 0
+        
 class Administrators(models.Model):
     candidate = models.ForeignKey(Candidate, primary_key=True, unique=True)
