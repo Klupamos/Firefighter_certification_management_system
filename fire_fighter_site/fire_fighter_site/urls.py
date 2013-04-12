@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, include, url
-from fire_fighter_site.views.presentation import login, logout, candidate_registration, public_certs, account_info, account_certs, training, certifying, admin
+from fire_fighter_site.views.presentation import login, logout, candidate_registration, public_certs, account_info, training, certifying, admin
 from fire_fighter_site.views.ajax import administrate_offices
 
 # Uncomment the next two lines to enable the admin:
@@ -14,7 +14,7 @@ urlpatterns = patterns('',
     url(r'^candidate_registration$',candidate_registration.display),
     url(r'^public_certs$',          public_certs.display),
     url(r'^account_info$',          account_info.display),
-    url(r'^account_certs$',         account_certs.display),
+    url(r'^account_certs$',         public_certs.display),
     url(r'^training$',              training.display),
     url(r'^certifying$',            certifying.display),
     url(r'^admin$',                 admin.display),

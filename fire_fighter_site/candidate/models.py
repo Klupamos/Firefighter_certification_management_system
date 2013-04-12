@@ -9,6 +9,7 @@ class Certification(models.Model):
     name = models.CharField(max_length=50, unique=True)
     description = models.CharField(max_length=1000)
     requirements = models.ManyToManyField('Requirement', related_name='certifications')
+    certifications = models.ManyToManyField("self")
     months_valid = models.IntegerField(default=0) #number of months this certification is valid. 0 for never
     def __unicode__(self):
         return self.name
@@ -32,12 +33,12 @@ class Requirement(models.Model):
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 class CandidateManager(BaseUserManager):
-    def create_user(self, emailaddress, password, firstname, lastname, street, city, postal, state):
-        if not emailaddress:
+    def create_user(self, email_address, password, firstname, lastname, street, city, postal, state):
+        if not email_address:
             raise ValueError('User must have a username')
            
         user = self.model(
-            email_address = emailaddress,
+            email_address = email_address,
             first_name = firstname,
             last_name = lastname,
             street_address = street,
@@ -61,7 +62,7 @@ class CandidateManager(BaseUserManager):
             state     = kwargs['state_abrv']
         )
         user.administrator_approved = True
-        user.appoint_as_administrator()
+        user.Appoint_As_Administrator()
         user.save(using=self._db)
         return user
  
@@ -149,32 +150,43 @@ class Candidate(AbstractBaseUser):
         self.is_active = True
         self.save()
         
-    def Earned_Requirement(self, req):
-        self.earned_requirements.add(req)
-        self.save()
+    def Add_Requirement(self, req):
+        candidate_earned_requirement.objects.get_or_create(candidate = self, requirement = req)
         
-    def Earned_Certification(self, cert):
-        self.earned_certifications.add(cert)
-        self.save()
+    def Revoke_Requirement(self, req):
+        candidate_earned_requirement.objects.get_or_create(candidate = self, requirement = req)[0].delete()
         
+        
+    def Add_Certification(self, cert):
+        candidate_earned_certification.objects.get_or_create(candidate = self, certification = cert)
+        for sub_cert in cert.certifications.all():
+            self.Add_Certification(sub_cert)
+        for req in cert.requirements.all():
+            self.Add_Requirement(req)
+
+    def Revoke_Certification(self, cert, remove_reqs = False):
+        candidate_earned_certification.objects.get_or_create(candidate = self, certification = cert)[0].delete()
+        if remove_reqs:
+            for r in cert.requirements.all():
+                candidate_earned_requirement.objects.filter(candidate = self).filter(requirement = r).delete()
         
 class candidate_earned_certification(models.Model):
     candidate = models.ForeignKey(Candidate, primary_key=True)
     certification = models.ForeignKey(Certification)
-    date = models.DateField()
-
-    
-class candidate_earned_requirement(models.Model):
-    candidate = models.ForeignKey(Candidate, primary_key=True)
-    requirements = models.ForeignKey(Requirement)
     date = models.DateField(auto_now_add=True)
     expiration_date = models.DateField(null=True)
     # don't know how many of these are necessary
-    IFSAC_date = models.DateField()
-    IFSAC_number = models.IntegerField()
-    PRO_date = models.DateField()
-    PRO_number = models.IntegerField()
+    IFSAC_date = models.DateField(null=True)
+    IFSAC_number = models.IntegerField(null=True)
+    PRO_date = models.DateField(null=True)
+    PRO_number = models.IntegerField(null=True)
     company = models.CharField(max_length=20)
+    
+class candidate_earned_requirement(models.Model):
+    candidate = models.ForeignKey(Candidate, primary_key=True)
+    requirement = models.ForeignKey(Requirement)
+    date = models.DateField(auto_now_add=True)
+
     
     
 class Jurisdiction(models.Model):

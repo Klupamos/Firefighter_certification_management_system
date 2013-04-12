@@ -1,17 +1,48 @@
 {% extends "base_template.djt" %}
 
 {% block head %}
-
+<style>
+    div.content div{
+        border: 1px solid black
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<h1>All certificates and requiremnts</h1>
-
-{% for x in all %}
+<h1>Earned</h1>
+{% for cert in full_cert %}
 <div>
-	<h3> {{ x.name }} </h3><ul>
-	{% for r in x.requirements.all %}
-		<li> {{r.name}} </li>
+	<h3 style="color:red;">{{ cert.name }}</h3>
+    <h5>{{ cert.description }}</h5>
+    <ul>
+	{% for req in cert.requirements.all %}
+		<li {% if req %}style="color:red;"{%endif%} > {{req.name}} </li>
+	{% endfor %}
+	</ul>
+</div>
+{% endfor %}
+
+<h1>Partial Earned</h1>
+{% for cert in part_cert %}
+<div>
+	<h3>{{ cert.name }}</h3>
+    <h5>{{ cert.description }}</h5>
+    <ul>
+	{% for req in cert.requirements.all %}
+		<li> {{req.name}} </li>
+	{% endfor %}
+	</ul>
+</div>
+{% endfor %}
+
+<h1>Not Earned</h1>
+{% for cert in none_cert %}
+<div>
+	<h3>{{ cert.name }}</h3>
+    <h5>{{ cert.description }}</h5>
+    <ul>
+	{% for req in cert.requirements.all %}
+		<li> {{req.name}} </li>
 	{% endfor %}
 	</ul>
 </div>
