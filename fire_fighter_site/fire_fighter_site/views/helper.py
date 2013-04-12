@@ -16,13 +16,13 @@ def create_navlinks(user):
         for a in config.items('Candidate URLs'):
             nav_links.append(anchor(a[0], a[1]))
                 
-        if user.is_training_officer():
+        if user.Is_Authorized('TO'):
             for a in config.items('Training Officer URLs'):
                 nav_links.append(anchor(a[0], a[1]))
-        if user.is_certifying_officer():
+        if user.Is_Authorized('CO'):
             for a in config.items('Certifying Officer URLs'):
                 nav_links.append(anchor(a[0], a[1]))
-        if user.is_administrator():
+        if user.Is_Authorized('AD'):
             for a in config.items('Administration URLs'):
                 nav_links.append(anchor(a[0], a[1]))
     else:

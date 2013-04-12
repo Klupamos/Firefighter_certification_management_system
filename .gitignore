@@ -2,6 +2,9 @@
 *.so
 *.pyc
 
+#vim swap files
+*.swp
+
 # Packages
 *.egg
 *.egg-info

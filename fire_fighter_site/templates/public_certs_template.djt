@@ -3,17 +3,47 @@
 {% block head %}
 <style>
     div.content div{
-        border: 1px solid black
+        border: 1px solid black;
+        float: left;
+        margin: 5px;
+        padding: 5px;
+        width: 350px;
+        height: 175px;
+    }
+    div.content h1,h2,h3,h4,h3{
+        clear:both;
     }
 </style>
 {% endblock %}
 
 {% block content %}
+
+
 {% if full_cert %}
-<h1>Earned</h1>
+<h3>Earned</h3>
 {% for cert in full_cert %}
 <div>
 	<h3 style="color:red;">{{ cert.name }}</h3>
+    <h5>{{ cert.description }}</h5>
+    <ul>
+	{% for req in cert.requirements.all %}
+		<li style="color:red;"> {{req.name}} </li>
+	{% endfor %}
+	</ul>
+</div>
+{% endfor %}
+{% else %}
+<h3> No certs earned yet </h3>
+{% endif %}
+
+
+
+
+{% if part_cert %}
+<h3>Partial Earned</h3>
+{% for cert in part_cert %}
+<div>
+	<h3>{{ cert.name }}</h3>
     <h5>{{ cert.description }}</h5>
     <ul>
 	{% for req in cert.requirements.all %}
@@ -22,28 +52,16 @@
 	</ul>
 </div>
 {% endfor %}
+{% else %}
+<h3>No partial earned certificates earned yet</h3>
 {% endif %}
 
-{% if part_cert %}
-<h1>Partial Earned</h1>
-{% for cert in part_cert %}
-<div>
-	<h3>{{ cert.name }}</h3>
-    <h5>{{ cert.description }}</h5>
-    <ul>
-	{% for req in cert.requirements %}
-		<li  style="color:red;" > {{req.name}} </li>
-        {%if req.candidate_set %}
-        BLAAAAA
-        {% endif %}
-	{% endfor %}
-	</ul>
-</div>
-{% endfor %}
-{% endif %}
+
+
+
 
 {% if none_cert %}
-<h1>Not Earned</h1>
+<h3>Not Earned</h3>
 {% for cert in none_cert %}
 <div>
 	<h3>{{ cert.name }}</h3>
@@ -56,5 +74,4 @@
 </div>
 {% endfor %}
 {% endif %}
-
-{%endblock %}
+{% endblock %}

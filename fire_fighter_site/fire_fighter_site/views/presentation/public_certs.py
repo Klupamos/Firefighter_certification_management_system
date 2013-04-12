@@ -12,7 +12,7 @@ def display(request):
     
     if (request.user.is_authenticated()):
         context_dict['full_cert'] = request.user.earned_certifications.all()
-        context_dict['part_cert'] = Certification.objects.exclude(candidate = request.user).filter(requirements__candidate = request.user)
+        context_dict['part_cert'] = Certification.objects.exclude(candidate = request.user).filter(requirements__candidate = request.user).distinct()
         
         
         

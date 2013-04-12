@@ -22,10 +22,12 @@ class Certification(models.Model):
         ordering = ["name"]
         
     def Add_Requirements(self, *req_list):
+        print self, " adding: ", req_list
         self.requirements.add(*req_list)
         self.save()
 
     def Add_Certifications(self, *cert_list):
+        print self, " adding: ", cert_list
         cert_list.remove(self)
         self.requirements.add(*cert_list)
         self.save()
@@ -107,7 +109,7 @@ class Candidate(AbstractBaseUser):
 
     class Meta:
         ordering = ["last_name", "first_name"]
-        unique_together = ('first_name','middle_initial','last_name','suffix')
+        #unique_together = ('first_name','middle_initial','last_name','suffix')
     
 #class methods
     def get_full_name(self): # defined in AbstractBaseUser
@@ -200,23 +202,21 @@ class Candidate(AbstractBaseUser):
     def Add_Requirements(self, *req_list):
         if not req_list:
             return
-
-        print "Adding: ", req_list
+        req_list = set(req_list)
+        print self, " adding: ", req_list
         for req in req_list:
             candidate_earned_requirement.objects.get_or_create(candidate = self, requirement = req)
         
     def Remove_Requirements(self, *req_list, **kargs):
         if not req_list:
             return
+        req_list = set(req_list)
+        print self, " removing: ", req_list
         
-        print "Removing: ", req_list
-        
-        super_cert_list = []
+        super_cert_list = set()
         Q_filter = []
         for req in req_list:
-            tmp = req.certifications.all()
-            if tmp:
-                super_cert_list.append(*tmp)
+            super_cert_list.update(req.certifications.all())
             
             Q_filter.append(Q(candidate = self, requirement = req))
         
@@ -234,10 +234,10 @@ class Candidate(AbstractBaseUser):
     def Add_Certifications(self, *cert_list, **cert_key_words):
         if not cert_list:
             return
-
-        sub_req_list = []
-        sub_cert_list = []
-        print "Adding: ", cert_list
+        cert_list = set(cert_list)
+        print self, " adding: ", cert_list
+        sub_req_list = set()
+        sub_cert_list = set()
         for cert in cert_list:
             cert_obj = candidate_earned_certification.objects.get_or_create(candidate = self, certification = cert)
             if cert_obj[1] and cert_key_words:
@@ -249,13 +249,8 @@ class Candidate(AbstractBaseUser):
                 cert_obj[0].company =       cert_key_words.get('company',None)
                 cert_obj[0].save()
                 
-            tmp = cert.requirements.all()
-            if tmp: 
-                sub_req_list.append(*tmp)
-                
-            tmp = cert.certifications.all()
-            if tmp: 
-                sub_cert_list.append(*tmp)
+            sub_req_list.update(cert.requirements.all())
+            sub_cert_list.update(cert.certifications.all())
                 
         self.Add_Certifications(*sub_cert_list)
         self.Add_Requirements(*sub_req_list)
@@ -263,17 +258,15 @@ class Candidate(AbstractBaseUser):
     def Remove_Certifications(self, *cert_list, **kargs):
         if not cert_list:
             return
-
-        print "Removing: ", cert_list
+        cert_list = set(cert_list)
+        print self, "removing: ", cert_list
         
-        super_cert_list = []
+        super_cert_list = set()
         Q_filter = []
-        sub_req_list = []
-        sub_cert_list = []
+        sub_req_list = set()
+        sub_cert_list = set()
         for cert in cert_list:
-            tmp = cert.certifications.all()
-            if tmp:
-                super_cert_list.append(*tmp)
+            super_cert_list.update(cert.certifications.all())
             Q_filter.append(Q(candidate = self, certification = cert))
         
         delete_list = candidate_earned_certification.objects.filter(reduce(__or__, Q_filter))
@@ -283,14 +276,10 @@ class Candidate(AbstractBaseUser):
 
             for ec in delete_list:
                 # Tally up requirements
-                tmp = ec.certification.requirements.all()
-                if tmp:
-                    sub_req_list.append(*tmp)
+                sub_req_list.update(ec.certification.requirements.all())
                 
                 # Tally up sub_certs
-                tmp = ec.certification.certifications.all()
-                if tmp:
-                    sub_cert_list.append(*tmp)
+                sub_cert_list.update(ec.certification.certifications.all())
                 
 
                 
@@ -312,7 +301,7 @@ class Candidate(AbstractBaseUser):
         return Certification.objects.filter(candidate = self)
         
 class candidate_earned_certification(models.Model):
-    candidate = models.ForeignKey(Candidate, primary_key=True, unique=False)
+    candidate = models.ForeignKey(Candidate) 
     certification = models.ForeignKey(Certification)
     date = models.DateField(auto_now_add=True)
     expiration_date = models.DateField(null=True)
@@ -324,7 +313,7 @@ class candidate_earned_certification(models.Model):
     company = models.CharField(max_length=20)
     
 class candidate_earned_requirement(models.Model):
-    candidate = models.ForeignKey(Candidate, primary_key=True)
+    candidate = models.ForeignKey(Candidate)
     requirement = models.ForeignKey(Requirement)
     date = models.DateField(auto_now_add=True)
         
