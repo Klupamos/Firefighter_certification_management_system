@@ -47,5 +47,10 @@ c2.Add_Certifications(cert4)
 c2.save()
 
 
+j1 = Jurisdiction.objects.get_or_create(name = "Fairbanks")[0]
+j2 = Jurisdiction.objects.get_or_create(name = "North pole")[0]
 
+c1.Make_Certifying_Officer_of(j2)
+c1.Request_Jurisdiction_Transfer(j1)
+c1.save()
 
