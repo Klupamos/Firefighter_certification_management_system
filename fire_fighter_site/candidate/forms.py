@@ -5,16 +5,6 @@ from django import forms
 from django.contrib.auth import get_user_model
 from candidate.models import * 
 
-class CertificationForm(ModelForm):
-    class Meta:
-        model = Certification
-
-        
-class RequirementForm(ModelForm):
-    class Meta:
-        model = Requirement
-
-
 class CandidateLoginForm(ModelForm):
     class Meta:
         model = get_user_model()
@@ -46,66 +36,27 @@ class NewCandidateForm(ModelForm):
         widgets = {
             'password': forms.PasswordInput(),
         }
+       
 
-
+class PreScreenForm(forms.Form):
+        jurisdiction = forms.ChoiceField()
+        certification = forms.ChoiceField()
         
-class UpdateCandidateForm(ModelForm):
-    fire_fighter_ID = forms.CharField()
-    class Meta:
-        model = get_user_model()
-        exclude = ('password',)
-        widgets = {
-            'fire_fighter_ID': forms.TextInput(attrs={'disabled':True, 'name':'', 'value':'XXXX####'}), # candidate.get_firefighter_id()
-            }
+        def __init__(self, *args, **kwargs):
+            officer = [kwargs.get('Officer', None)]
+            del kwargs['Officer']
+            super(PreScreenForm, self).__init__(*args, **kwargs)
             
-class UpdateUserForm(ModelForm):
-    new_password = forms.CharField(widget=forms.PasswordInput)
-    confirm_password = forms.CharField(widget=forms.PasswordInput)
-    old_password = forms.CharField(widget=forms.PasswordInput)
-    class Meta:
-        model = get_user_model()
-        fields = ('email_address', 'new_password', 'confirm_password', 'old_password',)
-        widgets = {
-            'password': forms.PasswordInput(),
-        }
+            valid_certifications = [(c['id'], c['name']) for c in Certification.objects.all().order_by('name').values('id', 'name')]
+            valid_jurisdictions = []
+            if officer:            
+                valid_jurisdictions.extend([(j['id'], j['name']) for j in Jurisdiction.objects.filter(certifying_officer__in = officer).values('id', 'name')])
+            else:
+                valid_jurisdictions.extend([(j['id'], j['name']) for j in Jurisdiction.objects.all().values('id', 'name')])
+                
+            self.fields['jurisdiction'] = forms.ChoiceField(choices=valid_jurisdictions)
+            self.fields['certification'] = forms.ChoiceField(choices=valid_certifications)
 
-            
-class NewJurisdictionForm(ModelForm):
-    class Meta:
-        model = Jurisdiction
-        exclude = ('training_officer', 'certifying_officer',)
-
-        
-class CandidateTransferRequestForm(ModelForm):
-    class Meta:
-        model = Transfer_Request
-        exclude = ('candidate', 'TO_approval')
-
-        
-class TrainingTransferApprovalForm(ModelForm):
-    class Meta:
-        model = Transfer_Request
-        widgets = {
-            'candidate': forms.TextInput(attrs={'disabled':True}),
-            }
-
-            
-class AdminTransferApprovalForm(ModelForm):
-    Admin_approval = forms.CheckboxInput
-    class Meta:
-        model = Transfer_Request
-        exclude = ('TO_approval',)
-        widgets = {
-            'candidate': forms.TextInput(attrs={'disabled':True}),
-            }
-
-            
-class AdminCertificationApprovalForm(ModelForm):
-    class Meta:
-        model = candidate_earned_certification
-
-        
-        
 class AdministrateOfficesForm(forms.Form):
     candidate =     forms.ChoiceField()
     FORM_ACTIONS = (

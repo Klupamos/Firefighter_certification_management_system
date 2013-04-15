@@ -1,0 +1,3 @@
+{% extends "ajax_template.djt" %}
+
+{% block ajax_data %}{{ cand_list }}{% endblock %}

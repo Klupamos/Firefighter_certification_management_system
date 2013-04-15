@@ -1,3 +1,4 @@
+{% extends "ajax_template.djt" %}
 {% block ajax_data %}
 
 <pre>

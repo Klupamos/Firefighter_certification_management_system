@@ -34,7 +34,6 @@ config.set('Anonymous URLs', 'Account Registration', 'candidate_registration')
 config.add_section('Candidate URLs')
 config.set('Candidate URLs', 'Logout','/logout')
 config.set('Candidate URLs', 'Account Information', '/account_info')
-config.set('Candidate URLs', 'Account Certificates', '/account_certs')
 
 config.add_section('Training Officer URLs')
 config.set('Training Officer URLs', 'Training Officer', '/training')
@@ -46,7 +45,7 @@ config.add_section('Administration URLs')
 config.set('Administration URLs', 'Administration', '/admin')
 
 config.add_section('Everyone URLs')
-config.set('Everyone URLs', 'View Certificates', '/public_certs')
+config.set('Everyone URLs', 'View Certificates', '/certification_list')
 
 # Writing our configuration file to 'example.cfg'
 with open(settings.CONFIG_FILE, 'wb') as configfile:

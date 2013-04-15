@@ -3,7 +3,7 @@ from django.conf import settings
 
 # for Candidate.(Add/Remove)_(Certification/Requirement)
 from django.db.models import Q
-from operator import __or__
+from operator import __or__, __and__
 
 class Certification(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -12,6 +12,9 @@ class Certification(models.Model):
     certifications = models.ManyToManyField("self")
     months_valid = models.IntegerField(default=0) #number of months this certification is valid. 0 for never
     deprecated = models.BooleanField(default=False)
+    
+    dependency_check = False # not saved to database, just a normal veriable
+    
     def __unicode__(self):
         return self.name
     
@@ -21,6 +24,7 @@ class Certification(models.Model):
     def Add_Requirements(self, *req_list):
 #        print self, " adding: ", req_list
         self.requirements.add(*req_list)
+        dependency_check = True
         self.save()
 
     def Remove_Requirements(self, *req_list):
@@ -31,6 +35,7 @@ class Certification(models.Model):
 #        print self, " adding: ", cert_list
         cert_list = filter(lambda c : c != self, cert_list) #can't add self
         self.certifications.add(*cert_list)
+        dependency_check = True
         self.save()
     
     def Remove_Certifications(self, *cert_list):
@@ -44,15 +49,18 @@ class Certification(models.Model):
     def Is_Deprecated(self):
         return self.deprecated
 
-    def Eligible_Candidates_List(self):
-        Candidates.objects.all()
-        raise 0
+    def Eligible_Candidates_List(self, jurisdiction):
+        return jurisdiction.Eligible_Candidates_List(self)
     
-    def update(self, *args, **kwargs):
-        # Should this go through the previously earned certifications and update expiraetion_dates, remove if not all reqs meet? Shoudl ther ba a grand_father flag?
-        if False:
-            grandfather_list = candidate_earned_certification.objects.filter(certification = self)
-        super(Certification, self).update(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        if self.dependency_check:
+            if False: # or months_valid has changed
+                grandfather_list = candidate_earned_certification.objects.filter(certification = self)
+            if False: # or added new requirement or certificatino
+                Candidate.objects.filter(earned_certifications__in = self)
+                self.Eligible_Candidates_List()
+            raise 0
+        super(Certification, self).save(*args, **kwargs)
         
 class Requirement(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -356,16 +364,18 @@ class candidate_earned_certification(models.Model):
         return self.candidate.get_firefighter_id() + " earned '" + str(self.certification) + "'"
     
     def save(self, *args, **kwargs):
-        inc_month = self.certification.months_valid
-        if not self.date:
-            self.date = date.today()
-        if inc_month:
-            exp_year = self.date.year + (self.date.month - 1 + inc_month) / 12
-            exp_month = (self.date.month - 1 + inc_month) % 12 + 1
-            exp_day = min(self.date.day, monthrange(exp_year, exp_month)[1])
-            self.expiration_date = date(exp_year, exp_month, exp_day)
-        else:
-            self.expiration_date = None
+        if not kwargs.get('Grandfather', True):
+            inc_month = self.certification.months_valid
+            if not self.date:
+                self.date = date.today()
+                
+            if inc_month:
+                exp_year = self.date.year + (self.date.month - 1 + inc_month) / 12
+                exp_month = (self.date.month - 1 + inc_month) % 12 + 1
+                exp_day = min(self.date.day, monthrange(exp_year, exp_month)[1])
+                self.expiration_date = date(exp_year, exp_month, exp_day)
+            else:
+                self.expiration_date = None
         super(candidate_earned_certification, self).save(*args, **kwargs)
     
 class candidate_earned_requirement(models.Model):
@@ -409,10 +419,25 @@ class Jurisdiction(models.Model):
     def Revoke_Certifying_Officers(self, *candidate):
         for c in candidate:
             self.certifying_officer.remove(c)
-            
+           
+    def Candidate_List(self):
+        return self.candidate_list.all()
+    
+    def Eligible_Candidates_List(self, certification):
+        q_set = self.Candidate_List()
+        if certification:
+            q_filter = []
+            for req in certification.requirements.all():
+                q_filter.append(Q(earned_requirements__in =  [req]))
+            for cert in certification.certifications.all():
+                q_filter.append(Q(earned_requirements__in =  [cert]))
+                
+            q_set = q_set.exclude(earned_certifications__in = [certification]).filter(reduce(__and__, q_filter)).distinct()
+        return q_set
+    
 class Transfer_Request(models.Model):
-    jurisdiction = models.ForeignKey(Jurisdiction, related_name='requested_transfers', primary_key=True)
-    candidate    = models.ForeignKey(Candidate, related_name='transfer_request', unique=True)
+    jurisdiction = models.ForeignKey(Jurisdiction, related_name='requested_transfers', null=True)
+    candidate    = models.ForeignKey(Candidate, related_name='transfer_request', primary_key=True, unique=True)
     TO_approval  = models.BooleanField(default=False)
 
     def __unicode__(self):

@@ -22,18 +22,25 @@
 	}
 	
 	div.navigation li{
-		margin: 5px;
+		margin: 15px 5px;
 		font-weight: bold;
 	}
 	
 	div.navigation a{
-		color: orange;
+        padding: 5px;
 		text-decoration: none;
-		text-transform:  uppercase;
-	}
+		text-transform:  capitalize;
 
+		color: black;
+        background-color: white;
+        border: 1px solid black;
+        border-radius: 5px;
+        -moz-border-radius: 5px;
+	}
+    
 	div.navigation a:hover{
-		color: red;
+        padding: 4px 5px;
+        background-color: #CCCCCC;
 	}
 	
 	/* CSS regulating all other elements */

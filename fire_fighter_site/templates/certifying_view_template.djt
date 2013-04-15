@@ -1,0 +1,48 @@
+{% extends "base_template.djt" %}
+
+{% block head %}
+<script>
+function get_cookie ( cookie_name ){
+    var results = document.cookie.match ( '(^|;) ?' + cookie_name + '=([^;]*)(;|$)' );
+    if ( results )
+        return ( unescape ( results[2] ) );
+    else
+        return null;
+}
+$(document).ready(function(){
+    $("#Certification_Prescreening li select").change(function(){
+        $.post("{{ form_handel }}",
+        {
+            jurisdiction: $("#id_jurisdiction").val(),
+            certification: $("#id_certification").val(),
+            csrfmiddlewaretoken: get_cookie('csrftoken')
+        },
+        function(data,status){
+            var candidates = data.split("|");
+            $("#candidate_list").empty()
+            if (candidates != ""){
+                for (c in candidates){
+                    $("#candidate_list").append("<li>"+candidates[c]+"</li>");
+                }
+            }
+        });
+    });
+    $("#Certification_Prescreening li:first select").trigger('change');
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div id="Certification_Prescreening">
+        {% csrf_token %}
+        <ul>
+        {{ ps_form }}
+        </ul>
+    <div>
+    <div>
+        <ul id="candidate_list">
+        </ul>
+    </div>
+    
+</div>
+{% endblock %}

@@ -4,14 +4,31 @@ from models import *
 class Certification_Tests(TestCase):
     def setUp(self):
         self.reqs = []
-        for i in range(5):
+        for i in range(3):
             req = Requirement.objects.create(name = "Requirement: "+str(i))
             self.reqs.append(req)
             
         self.certs = []
-        for i in range(5):
+        for i in range(3):
             cert = Certification.objects.create(name = "Certification: "+str(i), description = "Empty")
             self.certs.append(cert)
+        
+        self.certs[2].requirements.add(*self.reqs)
+        self.certs[2].save()
+          
+        self.jurs = []
+        for i in range(3):
+            jur= Jurisdiction.objects.create(name=str(i))
+            self.jurs.append(jur)
+        
+        self.cands = []
+        for i in range(3):
+            cand = Candidate.objects.create(email_address = "web"+str(i)+"@localhost.com", last_name=str(i), first_name=str(i))
+            cand.jurisdiction = self.jurs[2]
+            cand.Add_Requirements(*self.reqs)
+            cand.save()
+            self.cands.append(cand)
+        
         
     def test_Add_Requirement(self):
         self.certs[0].Add_Requirements(self.reqs[0])
@@ -117,6 +134,15 @@ class Certification_Tests(TestCase):
         self.certs[0].Deprecate(True)
         self.assertEqual(self.certs[0].deprecated, True)
 
+    def test_Eligible_Candidates_List(self):
+        q_set = [ x for x in self.jurs[2].Eligible_Candidates_List()]
+        empty = []
+        self.assertEqual(q_set, empty)
+        
+    def test_Eligible_Candidates_List(self):
+        q_set = [ x for x in self.jurs[2].Eligible_Candidates_List(self.certs[2])]
+        self.assertEqual(q_set, self.cands)        
+        
 class Candidate_Test(TestCase):
     def test_implement(self):
         pass
@@ -202,22 +228,22 @@ from datetime import date, timedelta
 class CEC_Test(TestCase):
     def setUp(self):
         self.cand = Candidate.objects.create(email_address = "webmaster@localhost.com", first_name = "f", last_name = "l")
-        self.cert_with_exp = lambda m : Certification.objects.create(name = "cert", months_valid = m)
+        self.cert = Certification.objects.create(name = "cert")
         
     def test_candidate_earned_certification_save(self):
         months = 9*12 + 11
-        cec = candidate_earned_certification.objects.create(candidate = self.cand, certification = self.cert_with_exp(months))
+        cec = candidate_earned_certification.objects.create(candidate = self.cand, certification = self.cert)
+        cec.update(months_valid = months)
         
         lazy_lower_limit = timedelta(days = (months/12) * 365 + (months%12) * 28)
         lazy_upper_limit = timedelta(days = (months/12) * 366 + (months%12) * 31)
-        
-        print str(lazy_lower_limit) + " <= " + str(cec.expiration_date - cec.date) + " <= " + str(lazy_upper_limit)
         
         self.assertEqual(cec.date, date.today())
         self.assertNotEqual(cec.expiration_date, cec.date)
         self.assertNotEqual(cec.expiration_date, None)
         self.assertGreaterEqual(cec.expiration_date - cec.date, lazy_lower_limit)
         self.assertLessEqual(cec.expiration_date - cec.date, lazy_upper_limit)
+        print str(lazy_lower_limit) + " <= " + str(cec.expiration_date - cec.date) + " <= " + str(lazy_upper_limit)
 
 class CER_Test(TestCase):
     def setUp(self):

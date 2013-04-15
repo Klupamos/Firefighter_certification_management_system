@@ -21,7 +21,7 @@ def response(request):
     if (not request.user.is_authenticated()):
         return redirect('/login')
 
-    if (not request.user.is_administrator()):
+    if (not request.user.Is_Administrator()):
         return redirect('/account_info') 
     
     
