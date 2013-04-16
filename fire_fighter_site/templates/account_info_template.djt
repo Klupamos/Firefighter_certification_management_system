@@ -1,11 +1,18 @@
 {% extends "base_template.djt" %}
 
 {% block head %}
-<script>
-// md5hash()
-</script>
+<link href="/static/login.css" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block content %}
-<h1>My account information</h1>
+{% if invalid_login %}
+<div><p style="color:red">{{ invalid_login }}<p></div>
+{% endif %}  
+<form action="{{ path }}" method="POST" id="login_form">
+{% csrf_token %}
+<ul class="login_list">
+{{ login_form }}
+<li><input type="submit" /></li>
+</ul>
+</form>
 {%endblock %}
