@@ -8,7 +8,6 @@
 #pycharm
 *.idea
 
-
 # Packages
 *.egg
 *.egg-info
