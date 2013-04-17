@@ -15,12 +15,13 @@ class CandidateLoginForm(ModelForm):
         
 class NewCandidateForm(ModelForm):
     confirm_password = forms.CharField(max_length=32, widget=forms.PasswordInput)
+    new_password = forms.CharField(max_length=32, widget=forms.PasswordInput)
     required_css_class='required'
     class Meta:
         model = get_user_model()
         fields = (
             'email_address',
-            'password',
+            'new_password',
             'confirm_password',
             'first_name',
             'middle_initial',
@@ -33,10 +34,41 @@ class NewCandidateForm(ModelForm):
             'state_abrv',
             'jurisdiction',
         )
+        exclude = ('password')
         widgets = {
             'password': forms.PasswordInput(),
         }
-       
+
+from django.conf import settings
+class ChangeCandidateForm(ModelForm):
+    new_password = forms.CharField(max_length=32, widget=forms.PasswordInput,required=False)
+    old_password = forms.CharField(max_length=32, widget=forms.PasswordInput,required=True)
+    confirm_password = forms.CharField(max_length=32, widget=forms.PasswordInput,required=False)
+    required_css_class='required'
+    class Meta:
+        model = get_user_model()
+        fields = (
+            'email_address',
+            'old_password',
+            'new_password',
+            'confirm_password',
+            'first_name',
+            'middle_initial',
+            'last_name',
+            'suffix',
+            'phone_number',
+            'street_address',
+            'city_name',
+            'postal_code',
+            'state_abrv',
+            'jurisdiction',
+        )
+
+
+
+
+
+
 
 class PreScreenForm(forms.Form):
         jurisdiction = forms.ChoiceField()

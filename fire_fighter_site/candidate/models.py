@@ -111,7 +111,9 @@ class CandidateManager(BaseUserManager):
         user.Appoint_As_Administrator()
         user.save(using=self._db)
         return user
- 
+from django.forms import ModelForm
+from django import forms
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 class Candidate(AbstractBaseUser):
     # authentication
@@ -146,7 +148,8 @@ class Candidate(AbstractBaseUser):
     class Meta:
         ordering = ["last_name", "first_name"]
         #unique_together = ('first_name','middle_initial','last_name','suffix')
-    
+
+
 #class methods
     def get_full_name(self): # defined in AbstractBaseUser
         return " ".join(filter(None, (self.first_name, self.middle_initial, self.last_name, self.suffix)))
