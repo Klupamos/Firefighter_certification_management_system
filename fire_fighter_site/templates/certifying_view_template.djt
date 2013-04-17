@@ -11,20 +11,22 @@ function get_cookie ( cookie_name ){
 }
 $(document).ready(function(){
     $("#Certification_Prescreening li select").change(function(){
+        $("#candidate_list").fadeOut(100);
         $.post("{{ form_handel }}",
-        {
-            jurisdiction: $("#id_jurisdiction").val(),
-            certification: $("#id_certification").val(),
-            csrfmiddlewaretoken: get_cookie('csrftoken')
-        },
-        function(data,status){
-            var candidates = data.split("|");
-            $("#candidate_list").empty()
-            if (candidates != ""){
-                for (c in candidates){
-                    $("#candidate_list").append("<li>"+candidates[c]+"</li>");
+        $("#eligible_filter").serialize()
+        ).done(function(data,status){
+            $("#candidate_list").promise().done(function(){
+                this.empty();
+                for (var i = 0; i<data.length; i++){
+                    var item = document.createElement('li');
+                    $(item).text(data[i]);
+                    $("#candidate_list").append(item)
                 }
-            }
+                $("#candidate_list").fadeIn(100);
+
+            });
+        }).fail(function(data, status){
+            alert("An \'"+ status +"\' Error has occured");
         });
     });
     $("#Certification_Prescreening li:first select").trigger('change');
@@ -34,15 +36,15 @@ $(document).ready(function(){
 
 {% block content %}
 <div id="Certification_Prescreening">
+    <form id="eligible_filter" >
         {% csrf_token %}
         <ul>
         {{ ps_form }}
         </ul>
-    <div>
+    </form>
     <div>
         <ul id="candidate_list">
         </ul>
     </div>
-    
 </div>
 {% endblock %}

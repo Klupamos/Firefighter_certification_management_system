@@ -2,18 +2,20 @@ from django.db import models
 from django.conf import settings
 
 # for Candidate.(Add/Remove)_(Certification/Requirement)
-from django.db.models import Q
+from django.db.models import Q, F
 from operator import __or__, __and__
+from datetime import date
+from calendar import monthrange
 
+
+# Note any Certification the depends on a temporary certification(one with a non zero months_valid field) will be removed when the temporary certification expires
 class Certification(models.Model):
     name = models.CharField(max_length=50, unique=True)
     description = models.CharField(max_length=1000)
     requirements = models.ManyToManyField('Requirement', related_name='certifications')
     certifications = models.ManyToManyField("self")
-    months_valid = models.IntegerField(default=0) #number of months this certification is valid. 0 for never
+    months_valid = models.IntegerField(default=0)
     deprecated = models.BooleanField(default=False)
-    
-    dependency_check = False # not saved to database, just a normal veriable
     
     def __unicode__(self):
         return self.name
@@ -21,27 +23,36 @@ class Certification(models.Model):
     class Meta:
         ordering = ["name"]
         
+    #default is to revoke previuos earned certifications
     def Add_Requirements(self, *req_list):
 #        print self, " adding: ", req_list
         self.requirements.add(*req_list)
-        dependency_check = True
+        # earned certificaions no longer valid, so delete them
+        candidate_earned_certification.objects.filter(certification = self).delete()
         self.save()
 
     def Remove_Requirements(self, *req_list):
 #        print sef, " removing:", req_list
         self.requirements.remove(*req_list)
         
+    #default is to revoke previuos earned certifications
     def Add_Certifications(self, *cert_list):
 #        print self, " adding: ", cert_list
         cert_list = filter(lambda c : c != self, cert_list) #can't add self
         self.certifications.add(*cert_list)
-        dependency_check = True
+        # earned certificaions no longer valid, so delete them
+        candidate_earned_certification.objects.filter(certification = self).delete()
         self.save()
     
     def Remove_Certifications(self, *cert_list):
 #        print sef, " removing:", cert_list
         self.certifications.remove(*cert_list)
         
+    #default is to grandfather the earned certification
+    def Update_Earned_Expirations(self):
+        for ec in candidate_earned_certification.objects.filter(certification = self):
+            ec.no_grandfather()
+    
     def Deprecate(self, value):
         self.deprecated = value
         self.save()
@@ -53,13 +64,6 @@ class Certification(models.Model):
         return jurisdiction.Eligible_Candidates_List(self)
     
     def save(self, *args, **kwargs):
-        if self.dependency_check:
-            if False: # or months_valid has changed
-                grandfather_list = candidate_earned_certification.objects.filter(certification = self)
-            if False: # or added new requirement or certificatino
-                Candidate.objects.filter(earned_certifications__in = self)
-                self.Eligible_Candidates_List()
-            raise 0
         super(Certification, self).save(*args, **kwargs)
         
 class Requirement(models.Model):
@@ -101,7 +105,7 @@ class CandidateManager(BaseUserManager):
             city      = kwargs.get('city_name', None),
             postal    = kwargs.get('postal_code', None),
             state     = kwargs.get('state_abrv', None),
-            jut       = kwargs['jurisdiction']
+            jur       = kwargs['jurisdiction']
         )
         user.administrator_approved = True
         user.Appoint_As_Administrator()
@@ -121,14 +125,14 @@ class Candidate(AbstractBaseUser):
     suffix = models.CharField(max_length=4, blank=True, default='')
 
     # contact
-    phone_number = models.IntegerField(max_length=14, null=True) # (###)-###-#### ext: ####
-    street_address = models.CharField(max_length=50)
-    city_name = models.CharField(max_length=25)
-    postal_code = models.CharField(max_length=10)
-    state_abrv = models.CharField(max_length=20, default='AK')
+    phone_number = models.IntegerField(max_length=14, blank=True) # (###)-###-#### ext: ####
+    street_address = models.CharField(max_length=50, blank=True)
+    city_name = models.CharField(max_length=25, blank=True)
+    postal_code = models.CharField(max_length=10, blank=True)
+    state_abrv = models.CharField(max_length=20, blank=True, default='AK')
 
     #foreign keys
-    jurisdiction = models.ForeignKey('Jurisdiction', related_name='candidate_list', null=True)
+    jurisdiction = models.ForeignKey('Jurisdiction', related_name='candidate_list', null=True, blank=True)
     earned_certifications = models.ManyToManyField(Certification, through='candidate_earned_certification')
     earned_requirements = models.ManyToManyField(Requirement, through='candidate_earned_requirement')
 
@@ -203,7 +207,7 @@ class Candidate(AbstractBaseUser):
         jurisdictions = set(jurisdictions)    # remove duplicate
         self.certifies_jurisdiction.add(*jurisdictions)
         
-    def Retire_Certifying_Officer_of(self, *jurisdiction):
+    def Retire_Certifying_Officer_of(self, *jurisdictions):
         if not jurisdictions:
             return
         
@@ -332,8 +336,7 @@ class Candidate(AbstractBaseUser):
     def List_Certifications(self):
         return Certification.objects.filter(candidate = self)
         
-from datetime import date
-from calendar import monthrange
+
 class CustomManager(models.Manager):
     def flush_expired(self):
         cand_certs = {}
@@ -349,7 +352,7 @@ class CustomManager(models.Manager):
 class candidate_earned_certification(models.Model):
     candidate = models.ForeignKey(Candidate) 
     certification = models.ForeignKey(Certification)
-    date = models.DateField(auto_now_add=True)
+    earned_date = models.DateField(auto_now_add=True)
     expiration_date = models.DateField(null=True)
     # don't know how many of these are necessary
     IFSAC_date = models.DateField(null=True)
@@ -363,25 +366,23 @@ class candidate_earned_certification(models.Model):
     def __unicode__(self):
         return self.candidate.get_firefighter_id() + " earned '" + str(self.certification) + "'"
     
-    def save(self, *args, **kwargs):
-        if not kwargs.get('Grandfather', True):
-            inc_month = self.certification.months_valid
-            if not self.date:
-                self.date = date.today()
-                
-            if inc_month:
-                exp_year = self.date.year + (self.date.month - 1 + inc_month) / 12
-                exp_month = (self.date.month - 1 + inc_month) % 12 + 1
-                exp_day = min(self.date.day, monthrange(exp_year, exp_month)[1])
-                self.expiration_date = date(exp_year, exp_month, exp_day)
-            else:
-                self.expiration_date = None
-        super(candidate_earned_certification, self).save(*args, **kwargs)
+    def no_grandfather(self):
+        inc_month = self.certification.months_valid
+        if not self.date:
+            self.date = date.today()
+            
+        if inc_month:
+            exp_year = self.date.year + (self.date.month - 1 + inc_month) / 12
+            exp_month = (self.date.month - 1 + inc_month) % 12 + 1
+            exp_day = min(self.date.day, monthrange(exp_year, exp_month)[1])
+            self.expiration_date = date(exp_year, exp_month, exp_day)
+        else:
+            self.expiration_date = None
     
 class candidate_earned_requirement(models.Model):
     candidate = models.ForeignKey(Candidate)
     requirement = models.ForeignKey(Requirement)
-    date = models.DateField(auto_now_add=True)
+    earned_date = models.DateField(auto_now_add=True)
         
     def __unicode__(self):
         return self.candidate.get_firefighter_id() + " earned '" + str(self.requirement) + "'"
@@ -424,15 +425,13 @@ class Jurisdiction(models.Model):
         return self.candidate_list.all()
     
     def Eligible_Candidates_List(self, certification):
-        q_set = self.Candidate_List()
+        q_set = self.Candidate_List().exclude(earned_certifications__in = [certification])
         if certification:
-            q_filter = []
             for req in certification.requirements.all():
-                q_filter.append(Q(earned_requirements__in =  [req]))
+                q_set = q_set.filter(earned_requirements__in =  [req])
             for cert in certification.certifications.all():
-                q_filter.append(Q(earned_requirements__in =  [cert]))
-                
-            q_set = q_set.exclude(earned_certifications__in = [certification]).filter(reduce(__and__, q_filter)).distinct()
+                q_set = q_set.filter(earned_certifications__in =  [cert])
+
         return q_set
     
 class Transfer_Request(models.Model):

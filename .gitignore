@@ -5,6 +5,10 @@
 #vim swap files
 *.swp
 
+#pycharm
+*.idea
+
+
 # Packages
 *.egg
 *.egg-info

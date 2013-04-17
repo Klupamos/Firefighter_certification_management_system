@@ -11,14 +11,12 @@ def display(request):
     context_dict['nav_links'] = nav_links
     
     if (request.user.is_authenticated()):
-        context_dict['full_cert'] = request.user.earned_certifications.all()
-        context_dict['part_cert'] = Certification.objects.exclude(candidate = request.user).filter(requirements__candidate = request.user).distinct()
+            
+        context_dict['full_cert'] = Certification.objects.filter(candidate = request.user).values('name','requirements__name','certifications__name')
+#        
+        context_dict['part_cert'] = Certification.objects.exclude(candidate = request.user).filter(Q(requirements__candidate = request.user) | Q(certifications__candidate = request.user)).distinct().values('name', 'requirements__name', 'certifications__name')
         
-        
-        
-        
-        
-        context_dict['none_cert'] = Certification.objects.exclude(requirements__candidate = request.user)
+        context_dict['none_cert'] = Certification.objects.exclude(candidate = request.user).exclude(Q(requirements__candidate = request.user) | Q(certifications__candidate = request.user)).distinct().values('name', 'requirements__name', 'certifications__name')
     else:
         context_dict['none_cert'] = Certification.objects.all()
 
