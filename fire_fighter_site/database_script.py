@@ -36,7 +36,7 @@ c1 = Candidate.objects.get_or_create(email_address = "A@B.com", first_name = "Re
 c1.set_password("rootpass")
 c1.jurisdiction = j1
 c1.Request_Jurisdiction_Transfer(j2)
-c1.Add_Requirements(req4)
+c1.Add_Requirements(req1, req2, req3)
 c1.Make_Administrator()
 c1.Make_Certifying_Officer_of(j1)
 c1.Make_Certifying_Officer_of(j2)
@@ -46,7 +46,23 @@ c1.save()
 c2 = Candidate.objects.get_or_create(email_address = "B@C.com", first_name = "Bluetarch", last_name = "Mann", phone_number = 9074565588, street_address = "quiggly ln", city_name = "North pole", postal_code = 45337, state_abrv = "AK")[0]
 c2.set_password("moocow")
 c2.jurisdiction = j2
-c2.Add_Requirements(req1, req2, req3)
+c2.Add_Requirements(req4)
 c2.save()
+
+from datetime import date
+candidate_earned_certification.objects.filter(candidate = c2).update(
+    expiration_date = date(
+        date.today().year,
+        date.today().month,
+        28 if date.today().day <= 15 else 1
+    )
+)
+candidate_earned_certification.objects.filter(candidate = c1).update(
+    expiration_date = date(
+        date.today().year,
+        date.today().month,
+        28 if date.today().day >= 15 else 1
+    )
+)
 
 

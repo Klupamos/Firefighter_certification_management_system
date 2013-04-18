@@ -2,17 +2,29 @@
 
 {% block head %}
 <style>
-    div.content div{
+    div.content h1,h2,h3,h4,h3{
+        clear:both;
+    }
+    
+    div.content .certification{
         border: 1px solid black;
         float: left;
         margin: 5px;
         padding: 5px;
-        width: 350px;
-        height: 175px;
+        width: 315px;
+        height: 200px;
     }
-    div.content h1,h2,h3,h4,h3{
-        clear:both;
+    .cert_desc{
+        color: black;
     }
+    .expiry{
+        font-size: 0.5em;
+        color: black;
+    }
+    .earned{
+        color: red;
+    }
+    
 </style>
 {% endblock %}
 
@@ -22,12 +34,20 @@
 {% if full_cert %}
 <h3>Earned</h3>
 {% for cert in full_cert %}
-<div>
-	<h3 style="color:red;">{{ cert.name }}</h3>
-    <h5>{{ cert.description }}</h5>
-    <ul>
-	{% for req in cert.requirements.all %}
-		<li style="color:red;"> {{req.name}} </li>
+<div class="earned certification">
+	<h3 class="cert_name">
+        {{ cert.name }}
+        {% if cert.expiration %}<span class="expiry">(valid thru {{ cert.expiration }})</span>{% endif %}
+    </h3>
+    <h5 class="cert_desc">{{ cert.description }}</h5>
+    <ul class="cert_requirements">
+	{% for req in cert.sub_reqs %}
+		<li> {{req}} </li>
+	{% endfor %}
+    </ul>
+    <ul class="cert_certifications">
+	{% for cert in cert.sub_certs %}
+		<li> {{cert.name}} </li>
 	{% endfor %}
 	</ul>
 </div>
@@ -37,17 +57,20 @@
 {% endif %}
 
 
-
-
 {% if part_cert %}
 <h3>Partial Earned</h3>
 {% for cert in part_cert %}
-<div>
-	<h3>{{ cert.name }}</h3>
-    <h5>{{ cert.description }}</h5>
-    <ul>
-	{% for req in cert.requirements.all %}
-		<li> {{req.name}} </li>
+<div class="certification">
+	<h3 class="cert_name">{{ cert.name }}</h3>
+    <h5 class="cert_desc">{{ cert.description }}</h5>
+    <ul class="cert_requirements">
+	{% for req in cert.sub_reqs %}
+		<li {% if req.earned %}class="earned"{% endif %}> {{req.name}} </li>
+	{% endfor %}
+    </ul>
+    <ul class="cert_certifications">
+	{% for cert in cert.sub_cert %}
+		<li{% if req.earned %}class="earned"{% endif %}> {{cert.name}} </li>
 	{% endfor %}
 	</ul>
 </div>
@@ -57,18 +80,20 @@
 {% endif %}
 
 
-
-
-
 {% if none_cert %}
 <h3>Not Earned</h3>
 {% for cert in none_cert %}
-<div>
-	<h3>{{ cert.name }}</h3>
-    <h5>{{ cert.description }}</h5>
-    <ul>
+<div class="certification">
+	<h3 class="cert_name">{{ cert.name }}</h3>
+    <h5 class="cert_desc">{{ cert.description }}</h5>
+    <ul class="cert_requirements">
 	{% for req in cert.requirements.all %}
 		<li> {{req.name}} </li>
+	{% endfor %}
+    </ul>
+    <ul class="cert_certifications">
+	{% for cert in cert.certifications.all %}
+		<li> {{cert.name}} </li>
 	{% endfor %}
 	</ul>
 </div>

@@ -12,21 +12,21 @@ function get_cookie ( cookie_name ){
 $(document).ready(function(){
     $("#Certification_Prescreening li select").change(function(){
         $("#candidate_list").fadeOut(100);
-        $.post("{{ form_handel }}",
-        $("#eligible_filter").serialize()
-        ).done(function(data,status){
+        $.post(
+            "{{ form_handel }}",
+            $("#eligible_filter").serialize()
+        ).done(function(data){
             $("#candidate_list").promise().done(function(){
                 this.empty();
                 for (var i = 0; i<data.length; i++){
-                    var item = document.createElement('li');
-                    $(item).text(data[i]);
-                    $("#candidate_list").append(item)
+                    $("#candidate_list").append(
+                        $("<li></li>").text(data[i])
+                    )
                 }
                 $("#candidate_list").fadeIn(100);
-
             });
-        }).fail(function(data, status){
-            alert("An \'"+ status +"\' Error has occured");
+        }).fail(function(data, text_Status, errorThrown){
+            alert("An "+errorThrown+" error has occured. Please try logging out and then back in.");
         });
     });
     $("#Certification_Prescreening li:first select").trigger('change');
