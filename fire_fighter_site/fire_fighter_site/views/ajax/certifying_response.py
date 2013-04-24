@@ -4,7 +4,7 @@ from candidate.models import Certification, Jurisdiction
 from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ObjectDoesNotExist
 
-def response(request):
+def candidate_filter(request):
     
     if not request.user.is_authenticated() or not request.user.Is_Authorized('CO'):
         raise PermissionDenied

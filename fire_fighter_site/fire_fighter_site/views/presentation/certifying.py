@@ -16,7 +16,7 @@ def display(request):
     context_dict = {}
     context_dict['nav_links'] = create_navlinks(request.user)
     context_dict['ps_form'] = PreScreenForm(Officer=request.user).as_ul()
-    context_dict['form_handel'] = "/certify/pre_screen"
+    context_dict['form_handel'] = "/certifying/filter"
     context_dict.update(csrf(request))
 
     return render_to_response('certifying_view_template.djt', context_dict)

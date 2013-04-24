@@ -116,4 +116,50 @@ class AdministrateOfficesForm(forms.Form):
         ])
         
         
+class RequirementDefinitionForm(ModelForm):
+    selection = forms.ChoiceField()
+    class Meta:
+        model = Requirement
+        fields = (
+            'selection',
+            'name',
+        )
+    def __init__(self, *args, **kwargs):
+        super(RequirementDefinitionForm, self).__init__(*args, **kwargs)
+        
+        ALL_REQS = [
+            (0, "Create New Requirement"),
+            ('div', "-----"),
+        ]
+        ALL_REQS.extend((req.id, str(req.name)) for req in Requirement.objects.all())
+        
+        self.fields['selection'] = forms.ChoiceField(choices = ALL_REQS)
 
+
+class CertificationDefinitionForm(ModelForm):
+    selection = forms.ChoiceField()
+    class Meta:
+        model = Certification
+        fields = (
+            'selection',
+            'name',
+            'description',
+            'months_valid',
+            'deprecated',
+            'certifications',
+            'requirements',
+        )        
+    
+    def __init__(self, *args, **kwargs):
+        super(CertificationDefinitionForm, self).__init__(*args, **kwargs)
+
+        ALL_CERTS = [(cert.id, str(cert.name)) for cert in Certification.objects.all()]
+        ALL_REQS = [(req.id, str(req.name)) for req in Requirement.objects.all()]
+        CERT_SELECTION = [
+            (0, "Create New Certification"),
+            ('div', "-----"),
+        ]
+        CERT_SELECTION.extend(ALL_CERTS)
+        
+        self.fields['selection'] = forms.ChoiceField(choices = CERT_SELECTION)
+        

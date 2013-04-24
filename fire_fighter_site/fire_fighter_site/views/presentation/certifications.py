@@ -1,6 +1,6 @@
 from django.template import Context, Template
 from django.template.loader import get_template
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response
 
 from fire_fighter_site.views.helper import create_navlinks
 from candidate.models import Requirement, Certification

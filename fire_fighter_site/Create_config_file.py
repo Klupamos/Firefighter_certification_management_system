@@ -28,24 +28,24 @@ config.set('Other','Secret_key','86c*_=^%(56-ur2$$ov1fn7)b$5sjg&hz8q5ki!%efdn9_8
 
 
 config.add_section('Anonymous URLs')
-config.set('Anonymous URLs', 'Login', '/login')
-config.set('Anonymous URLs', 'Account Registration', 'candidate_registration')
+config.set('Anonymous URLs', 'Login', '/account/login')
+config.set('Anonymous URLs', 'Account Registration', '/account/registration')
 
 config.add_section('Candidate URLs')
-config.set('Candidate URLs', 'Logout','/logout')
-config.set('Candidate URLs', 'Account Information', '/account_info')
+config.set('Candidate URLs', 'Logout','/account/logout')
+config.set('Candidate URLs', 'Account Information', '/account/modification')
 
 config.add_section('Training Officer URLs')
-config.set('Training Officer URLs', 'Training Officer', '/training')
+config.set('Training Officer URLs', 'Training Officer', '/training/display')
 
 config.add_section('Certifying Officer URLs')
-config.set('Certifying Officer URLs', 'Certifying Officer', '/certifying')
+config.set('Certifying Officer URLs', 'Certifying Officer', '/certifying/display')
 
 config.add_section('Administration URLs')
-config.set('Administration URLs', 'Administration', '/admin')
+config.set('Administration URLs', 'Definitions', '/administrator/definition')
 
 config.add_section('Everyone URLs')
-config.set('Everyone URLs', 'View Certificates', '/certification_list')
+config.set('Everyone URLs', 'View Certificates', '/certifications')
 
 # Writing our configuration file to 'example.cfg'
 with open(settings.CONFIG_FILE, 'wb') as configfile:

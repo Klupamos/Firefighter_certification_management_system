@@ -1,0 +1,28 @@
+{% extends "base_template.djt" %}
+
+{% block head %}
+{%endblock %}
+
+{% block content %}
+
+{% if requirement_form_response %}
+<div id="requirement_form">
+    <form action="{{requirement_form_response}}" method="POST">
+        {% csrf_token %}
+        {{ requirement_form }}
+        <input type="submit" />
+    </form>
+</div>
+
+{% endif %}
+{% if certification_form_response %}
+<div id="certification_form">
+    <form action="{{certification_form_response}}" method="POST">
+        {% csrf_token %}
+        {{ certification_form }}
+        <input type="submit" />
+    </form>
+</div>
+{% endif %}
+
+{% endblock %}

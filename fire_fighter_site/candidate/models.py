@@ -9,10 +9,20 @@ from calendar import monthrange
 
 
 # Note any Certification the depends on a temporary certification(one with a non zero months_valid field) will be removed when the temporary certification expires
+class Requirement(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def __unicode__(self):
+        return self.name
+    
+    class Meta:
+        ordering = ["name"]
+
+        
 class Certification(models.Model):
     name = models.CharField(max_length=50, unique=True)
     description = models.CharField(max_length=1000)
-    requirements = models.ManyToManyField('Requirement', related_name='certifications')
+    requirements = models.ManyToManyField(Requirement, related_name='certifications')
     certifications = models.ManyToManyField("self")
     months_valid = models.IntegerField(default=0)
     deprecated = models.BooleanField(default=False)
@@ -35,14 +45,33 @@ class Certification(models.Model):
 #        print sef, " removing:", req_list
         self.requirements.remove(*req_list)
         
+    def Is_Subcert_of(self, *cert_list):
+        if not cert_list:
+            return False
+        
+        cert_set = set(cert_list)
+        if set(cert_list).intersect(self):
+            return True
+        
+        sib_set = set()
+        for sub_cert in cert_list:
+            sib_set.update(sub_cert.certifications)
+        
+        return self.Is_Subcert_of(*sib_set)
+    
     #default is to revoke previuos earned certifications
     def Add_Certifications(self, *cert_list):
-#        print self, " adding: ", cert_list
-        cert_list = filter(lambda c : c != self, cert_list) #can't add self
+        # cycle detection
+        for cert in cert_list:
+            if self.Is_Subcert_of(*cert_list):
+                raise "cycle detected"
+                
+        befor = self.certifications
         self.certifications.add(*cert_list)
         # earned certificaions no longer valid, so delete them
-        candidate_earned_certification.objects.filter(certification = self).delete()
-        self.save()
+        if before != self.certifications:
+            candidate_earned_certification.objects.filter(certification = self).delete()
+            self.save()
     
     def Remove_Certifications(self, *cert_list):
 #        print sef, " removing:", cert_list
@@ -66,15 +95,6 @@ class Certification(models.Model):
     def save(self, *args, **kwargs):
         super(Certification, self).save(*args, **kwargs)
         
-class Requirement(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-
-    def __unicode__(self):
-        return self.name
-    
-    class Meta:
-        ordering = ["name"]
-
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 class CandidateManager(BaseUserManager):
     def create_user(self, email_address, password, firstname, lastname, street, city, postal, state, jur):
