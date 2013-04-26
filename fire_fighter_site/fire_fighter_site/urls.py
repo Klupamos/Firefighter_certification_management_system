@@ -29,10 +29,3 @@ urlpatterns = patterns('',
     #catch all redirects to login
     url(r'^.*$',                      account.login),
 )
-
-dict={}
-dict['certifications'] = {'pattern': r'^certifications$', 'function_call':certifications.display}
-
-#for key in dict.keys():
-#    urlpatterns.append(url(dict[key]['pattern'], dict[key]['function_call']))
-    

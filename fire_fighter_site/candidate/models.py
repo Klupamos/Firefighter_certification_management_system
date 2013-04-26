@@ -22,8 +22,8 @@ class Requirement(models.Model):
 class Certification(models.Model):
     name = models.CharField(max_length=50, unique=True)
     description = models.CharField(max_length=1000)
-    requirements = models.ManyToManyField(Requirement, related_name='certifications')
-    certifications = models.ManyToManyField("self")
+    child_requirements = models.ManyToManyField(Requirement, related_name='parent_certification')
+    child_certifications = models.ManyToManyField("self", related_name='parent_certification', symmetrical = False)
     months_valid = models.IntegerField(default=0)
     deprecated = models.BooleanField(default=False)
     
@@ -33,49 +33,58 @@ class Certification(models.Model):
     class Meta:
         ordering = ["name"]
         
-    #default is to revoke previuos earned certifications
+    #default is to revoke previous earned certifications
     def Add_Requirements(self, *req_list):
+        if not req_list:
+            return
 #        print self, " adding: ", req_list
-        self.requirements.add(*req_list)
-        # earned certificaions no longer valid, so delete them
-        candidate_earned_certification.objects.filter(certification = self).delete()
-        self.save()
+        before = set(self.child_requirements.all())
+        self.child_requirements.add(*req_list)
+        after = set(self.child_requirements.all())
+        # earned certifications no longer valid, so delete them
+        if after.difference(before):
+            candidate_earned_certification.objects.filter(certification = self).delete()
+            self.save()
 
     def Remove_Requirements(self, *req_list):
 #        print sef, " removing:", req_list
-        self.requirements.remove(*req_list)
+        self.child_requirements.remove(*req_list)
         
     def Is_Subcert_of(self, *cert_list):
-        if not cert_list:
+        cert_set = set(cert_list)
+        
+        if not cert_set:
             return False
         
-        cert_set = set(cert_list)
-        if set(cert_list).intersect(self):
+        if self in cert_set:
             return True
         
         sib_set = set()
-        for sub_cert in cert_list:
-            sib_set.update(sub_cert.certifications)
+        for sub_cert in cert_set:
+            sib_set.update(sub_cert.child_certifications.all())
         
         return self.Is_Subcert_of(*sib_set)
     
-    #default is to revoke previuos earned certifications
+    #default is to revoke previuos earned child_certifications
     def Add_Certifications(self, *cert_list):
+        if not cert_list:
+            return
         # cycle detection
-        for cert in cert_list:
-            if self.Is_Subcert_of(*cert_list):
-                raise "cycle detected"
-                
-        befor = self.certifications
-        self.certifications.add(*cert_list)
+        if self.Is_Subcert_of(*cert_list):
+            print "cycle detected"
+            raise "cycle detected"
+
+        before = set(self.child_certifications.all())        
+        self.child_certifications.add(*cert_list)
+        after = set(self.child_certifications.all())
         # earned certificaions no longer valid, so delete them
-        if before != self.certifications:
+        if after.difference(before):
             candidate_earned_certification.objects.filter(certification = self).delete()
             self.save()
     
     def Remove_Certifications(self, *cert_list):
 #        print sef, " removing:", cert_list
-        self.certifications.remove(*cert_list)
+        self.child_certifications.remove(*cert_list)
         
     #default is to grandfather the earned certification
     def Update_Earned_Expirations(self):
@@ -92,8 +101,6 @@ class Certification(models.Model):
     def Eligible_Candidates_List(self, jurisdiction):
         return jurisdiction.Eligible_Candidates_List(self)
     
-    def save(self, *args, **kwargs):
-        super(Certification, self).save(*args, **kwargs)
         
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 class CandidateManager(BaseUserManager):
@@ -147,14 +154,14 @@ class Candidate(AbstractBaseUser):
     suffix = models.CharField(max_length=4, blank=True, default='')
 
     # contact
-    phone_number = models.IntegerField(max_length=14, blank=True) # (###)-###-#### ext: ####
-    street_address = models.CharField(max_length=50, blank=True)
-    city_name = models.CharField(max_length=25, blank=True)
-    postal_code = models.CharField(max_length=10, blank=True)
+    phone_number = models.IntegerField(max_length=14, blank=True, null=True) # (###)-###-#### ext: ####
+    street_address = models.CharField(max_length=50, blank=True, null=True)
+    city_name = models.CharField(max_length=25, blank=True, null=True)
+    postal_code = models.CharField(max_length=10, blank=True, null=True)
     state_abrv = models.CharField(max_length=20, blank=True, default='AK')
 
     #foreign keys
-    jurisdiction = models.ForeignKey('Jurisdiction', related_name='candidate_list', null=True, blank=True)
+    jurisdiction = models.ForeignKey('Jurisdiction', related_name='candidate_list', blank=True, null=True)
     earned_certifications = models.ManyToManyField(Certification, through='candidate_earned_certification')
     earned_requirements = models.ManyToManyField(Requirement, through='candidate_earned_requirement')
 
@@ -264,7 +271,10 @@ class Candidate(AbstractBaseUser):
         tr.jurisdiction = jurisdiction
         tr.TO_approval = False
         tr.save()
-        
+    
+    def Revoke_Transfer_Request(self):
+        Transfer_Request.objects.filter(candidate = self).delete()
+    
     def Add_Requirements(self, *req_list):
         if not req_list:
             return
@@ -282,7 +292,7 @@ class Candidate(AbstractBaseUser):
         super_cert_list = set()
         Q_filter = []
         for req in req_list:
-            super_cert_list.update(req.certifications.all())
+            super_cert_list.update(req.parrent_certification.all())
             
             Q_filter.append(Q(candidate = self, requirement = req))
         
@@ -310,8 +320,8 @@ class Candidate(AbstractBaseUser):
                 cert_obj[0].update(cert_key_words)
                 cert_obj[0].save()
                 
-            sub_req_list.update(cert.requirements.all())
-            sub_cert_list.update(cert.certifications.all())
+            sub_req_list.update(cert.child_requirements.all())
+            sub_cert_list.update(cert.child_certifications.all())
                 
         if cert_key_words.get('cascade',True):
             # I should Add all requirements and certifications that make up the passed certifications
@@ -329,7 +339,7 @@ class Candidate(AbstractBaseUser):
         sub_req_list = set()
         sub_cert_list = set()
         for cert in cert_list:
-            super_cert_list.update(cert.certifications.all())
+            super_cert_list.update(cert.child_certifications.all())
             Q_filter.append(Q(candidate = self, certification = cert))
         
         delete_list = candidate_earned_certification.objects.filter(reduce(__or__, Q_filter))
@@ -339,10 +349,10 @@ class Candidate(AbstractBaseUser):
 
             for ec in delete_list:
                 # Tally up requirements
-                sub_req_list.update(ec.certification.requirements.all())
+                sub_req_list.update(ec.certification.child_requirements.all())
                 
                 # Tally up sub_certs
-                sub_cert_list.update(ec.certification.certifications.all())
+                sub_cert_list.update(ec.certification.child_certifications.all())
                 
 
         delete_list.delete()                
@@ -450,9 +460,9 @@ class Jurisdiction(models.Model):
     def Eligible_Candidates_List(self, certification):
         q_set = self.Candidate_List().exclude(earned_certifications__in = [certification])
         if certification:
-            for req in certification.requirements.all():
+            for req in certification.child_requirements.all():
                 q_set = q_set.filter(earned_requirements__in =  [req])
-            for cert in certification.certifications.all():
+            for cert in certification.child_certifications.all():
                 q_set = q_set.filter(earned_certifications__in =  [cert])
 
         return q_set
@@ -479,6 +489,7 @@ class Transfer_Request(models.Model):
     def Admin_Approval(self, value):
         if value:
             self.candidate.jurisdiction = self.jurisdiction
+            self.candidate.save()
         self.delete()
         
 class Administrators(models.Model):

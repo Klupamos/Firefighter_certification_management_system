@@ -12,7 +12,7 @@
         margin: 5px;
         padding: 5px;
         width: 315px;
-        height: 200px;
+//        height: 200px;
     }
     .cert_desc{
         color: black;
@@ -30,7 +30,11 @@
 
 {% block content %}
 
-
+<pre>
+{% for y in x %}
+    {{y}}
+{%endfor%}
+</pre>
 {% if full_cert %}
 <h3>Earned</h3>
 {% for cert in full_cert %}
@@ -42,7 +46,7 @@
     <h5 class="cert_desc">{{ cert.description }}</h5>
     <ul class="cert_requirements">
 	{% for req in cert.sub_reqs %}
-		<li> {{req}} </li>
+		<li> {{req.name}} </li>
 	{% endfor %}
     </ul>
     <ul class="cert_certifications">
@@ -69,7 +73,7 @@
 	{% endfor %}
     </ul>
     <ul class="cert_certifications">
-	{% for cert in cert.sub_cert %}
+	{% for cert in cert.sub_certs %}
 		<li{% if req.earned %}class="earned"{% endif %}> {{cert.name}} </li>
 	{% endfor %}
 	</ul>
@@ -87,12 +91,12 @@
 	<h3 class="cert_name">{{ cert.name }}</h3>
     <h5 class="cert_desc">{{ cert.description }}</h5>
     <ul class="cert_requirements">
-	{% for req in cert.requirements.all %}
+	{% for req in cert.sub_reqs %}
 		<li> {{req.name}} </li>
 	{% endfor %}
     </ul>
     <ul class="cert_certifications">
-	{% for cert in cert.certifications.all %}
+	{% for cert in cert.sub_certs %}
 		<li> {{cert.name}} </li>
 	{% endfor %}
 	</ul>

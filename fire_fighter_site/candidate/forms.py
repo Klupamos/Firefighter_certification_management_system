@@ -3,6 +3,7 @@
 from django.forms import ModelForm
 from django import forms
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from candidate.models import * 
 
 class CandidateLoginForm(ModelForm):
@@ -39,7 +40,6 @@ class NewCandidateForm(ModelForm):
             'password': forms.PasswordInput(),
         }
 
-from django.conf import settings
 class ChangeCandidateForm(ModelForm):
     new_password = forms.CharField(max_length=32, widget=forms.PasswordInput,required=False)
     old_password = forms.CharField(max_length=32, widget=forms.PasswordInput,required=True)
@@ -64,11 +64,7 @@ class ChangeCandidateForm(ModelForm):
             'jurisdiction',
         )
 
-
-
-
-
-
+        
 
 class PreScreenForm(forms.Form):
         jurisdiction = forms.ChoiceField()
@@ -146,8 +142,8 @@ class CertificationDefinitionForm(ModelForm):
             'description',
             'months_valid',
             'deprecated',
-            'certifications',
-            'requirements',
+            'child_certifications',
+            'child_requirements',
         )        
     
     def __init__(self, *args, **kwargs):

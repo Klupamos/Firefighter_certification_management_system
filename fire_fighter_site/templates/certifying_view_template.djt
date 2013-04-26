@@ -2,13 +2,7 @@
 
 {% block head %}
 <script>
-function get_cookie ( cookie_name ){
-    var results = document.cookie.match ( '(^|;) ?' + cookie_name + '=([^;]*)(;|$)' );
-    if ( results )
-        return ( unescape ( results[2] ) );
-    else
-        return null;
-}
+
 $(document).ready(function(){
     $("#Certification_Prescreening li select").change(function(){
         $("#candidate_list").fadeOut(100);

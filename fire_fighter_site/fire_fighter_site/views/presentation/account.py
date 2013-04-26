@@ -3,36 +3,44 @@ from django.core.context_processors import csrf
 from django.shortcuts import render_to_response, redirect
 from django.template import Context, Template
 from django.template.loader import get_template
+from django.core.exceptions import ObjectDoesNotExist
 
 from fire_fighter_site.views.helper import create_navlinks
 
 from candidate.models import Candidate
 from candidate.forms import NewCandidateForm, CandidateLoginForm, ChangeCandidateForm
 
-
-
-
 def registration(request):
     if (request.user.is_authenticated()):
         return redirect('/account/login')
     
     errors = None
+    form = NewCandidateForm(request.POST or None)
     if (request.method == 'POST'):
-        f = NewCandidateForm(request.POST)
-        if f.is_valid():
-            submited_candidate = f.save(commit=False) # get a candidate object without saving to the database
-            submited_candidate.set_password(f.cleaned_data['password']) # hash and set the supplied password
+        if form.is_valid():
+            submited_candidate = form.save(commit=False) # get a candidate object without saving to the database
+            submited_candidate.set_password(form.cleaned_data['confirm_password']) # hash and set the supplied password
+            
+            # make a request rather than manually set the jurisdiction
+            submited_candidate.Request_Jurisdiction_Transfer(form.cleaned_data['jurisdiction'])
+            submited_candidate.jurisdiction = None
+            
             submited_candidate.save()   # Now save to the database
-            auth.login(request, submited_candidate)
+            new_user = auth.authenticate(
+                username = form.cleaned_data['email_address'],
+                password = form.cleaned_data['confirm_password'],
+            )
+            auth.login(request, new_user)
+            return redirect('/account/modification')
         else:
-            errors = f.errors
+            errors = form.errors
             
     template_file = 'candidate_registration_template.djt'
     context_dict = {}
     context_dict['invalid_login'] = errors
     context_dict['path'] = request.path
     context_dict['nav_links'] = create_navlinks(request.user)
-    context_dict['login_form'] = NewCandidateForm().as_ul()
+    context_dict['login_form'] = form.as_ul()
     context_dict.update(csrf(request))
     return render_to_response(template_file, context_dict)
 
@@ -63,52 +71,54 @@ def logout(request):
     auth.logout(request)
     return redirect('/account/login')
 
+    
+from django.forms.models import modelform_factory
 def modify(request):
-   # if (request.user.is_authenticated()):
-   #     return redirect('/account/modification')
+    if not request.user.is_authenticated():
+        return redirect('/account/login')
+        
+
+    
     errors = None
+    cand = request.user
+    form = ChangeCandidateForm(request.POST or None, instance = cand)
     if (request.method == 'POST'):
-        a = Candidate.objects.get(email_address=request.POST.get('email_address'))
-        f = ChangeCandidateForm(request.POST,instance=a)
-        if a.check_password(request.POST.get('old_password')):
-            if request.POST.get('new_password') == request.POST.get('confirm_password') and request.POST.get('new_password') != '':
-                a.set_password(request.POST.get('new_password'))
-                a.save()
-
-
-        f.save()
-        # if f.is_valid():
-        #     print f
-        #    # submited_candidate = f.save(commit=False) # get a candidate object without saving to the database
-        #    # submited_candidate.set_password(f.cleaned_data['password']) # hash and set the supplied password
-        #    # submited_candidate.save()   # Now save to the database
-        #    # auth.login(request, submited_candidate)
-        #     f.save()
-        # else:
-        #     errors = f.errors
+        if form.is_valid() and cand.check_password(form.cleaned_data['old_password']):
+            print "PASSED"
+            if form.cleaned_data['new_password'] and form.cleaned_data['new_password'] == form.cleaned_data['confirm_password']:
+                # update password
+                print "Changing password to: '" + form.cleaned_data['new_password'] +"'"
+                cand.set_password(form.cleaned_data['new_password'])
+            
+            orig = Candidate.objects.get(pk = cand.pk)
+            if orig.jurisdiction ==  form.cleaned_data['jurisdiction']:
+                cand.Revoke_Transfer_Request()
+            else:
+                cand.Request_Jurisdiction_Transfer(form.cleaned_data['jurisdiction'])
+                errors = "Transfer Request Submitted"                
+                
 
     template_file = 'account_info_template.djt'
     context_dict = {}
     context_dict['invalid_login'] = errors
     context_dict['path'] = request.path
-    context_dict['nav_links'] = create_navlinks(request.user)
-    usr_dic = {
-        'email_address':request.user.email_address,
-#        'password':request.user.password,
-#       'confirm_password',
-        'first_name': request.user.first_name,
-        'middle_initial':request.user.middle_initial,
-        'last_name':request.user.last_name,
-        'suffix':request.user.suffix,
-        'phone_number':request.user.phone_number,
-        'street_address':request.user.street_address,
-        'city_name':request.user.city_name,
-        'postal_code':request.user.postal_code,
-        'state_abrv':request.user.street_address,
-        'jurisdiction':request.user.jurisdiction,}
-
-    tmp = ChangeCandidateForm(initial=usr_dic)
-    tmp.fields['email_address'].widget.attrs['disabled']=True
-    context_dict['login_form'] = tmp.as_ul()
+    context_dict['nav_links'] = create_navlinks(cand)
+    if False:
+        form = ChangeCandidateForm(initial = {
+            'email_address':    cand.email_address,
+            'first_name':       cand.first_name,
+            'middle_initial':   cand.middle_initial,
+            'last_name':        cand.last_name,
+            'suffix':           cand.suffix,
+            'phone_number':     cand.phone_number,
+            'street_address':   cand.street_address,
+            'city_name':        cand.city_name,
+            'postal_code':      cand.postal_code,
+            'state_abrv':       cand.street_address,
+            'jurisdiction':     cand.jurisdiction,
+        })
+    
+    context_dict['login_form'] = form.as_ul()
+    
     context_dict.update(csrf(request))
     return render_to_response(template_file, context_dict)
