@@ -1,0 +1,91 @@
+{% extends "base_template.djt" %}
+
+{% block head %}
+<!--
+<link rel="stylesheet" type"text/css" href="/static/multiselect.css" />
+<script src="/static/multiselect.js"></script>
+<script>
+$(document).ready(function(){
+    jQuery.each($("select[multiple]"), function () {  
+         // "Locations" can be any label you want  
+         SelectFilter.init(this.id, "Label", 0, "/media/");  
+    });
+});
+</script>
+-->
+<script>
+function get_cookie ( cookie_name ){
+    var results = document.cookie.match ( '(^|;) ?' + cookie_name + '=([^;]*)(;|$)' );
+    if ( results )
+        return ( unescape ( results[2] ) );
+    else
+        return null;
+}
+
+function display_results(index, element){
+     // 'this' provided by jQuery.proxy()
+     if (this[element.name] !== undefined){
+         jQuery(element).val(this[element.name]);
+     }
+ }
+
+var debug_data; // set to the result of the jQuery.post()
+function AjaxPost(destination_url, me){
+
+    var sel_option = jQuery(me).children().filter(":selected");
+    var this_form = jQuery(me).parents("form");
+
+    if (!(parseInt(sel_option.val()) > 0)){
+        return false;
+    }
+    // Note:
+    // NaN > 0 : false
+
+    return jQuery.post(
+        destination_url,
+        {
+            object_id: sel_option.val(),
+            csrfmiddlewaretoken: get_cookie("csrftoken") //for Cross Site Request Forgery checking
+            // note: can travers DOM to access parents form's csrfmiddlewaretoken input
+        }
+    ).done(function(data){
+        debug_data = data;
+        if (data[1] == true){
+            this_form.find('[name]').map(jQuery.proxy(display_results, data[0]))
+        }
+    }).fail(function(data){
+        debug_data = data;
+    });
+};
+
+
+$(document).ready(function(){
+    $("#requirement_form #id_selection").change(function(){
+        AjaxPost("{{requirement_form.pull_addr}}", $("#requirement_form #id_selection"));
+    });
+
+    $("#certification_form #id_selection").change(function(){
+        AjaxPost("{{certification_form.pull_addr}}", $("#certification_form #id_selection"));
+    });
+
+});
+</script>
+{%endblock %}
+
+{% block content %}
+{% if requirement_form %}
+<form id="requirement_form" action="{{requirement_form.push_addr}}" method="POST">
+    {% csrf_token %}
+    {{ requirement_form.elements.as_ul }}
+    <input type="submit" />
+</form>
+{% endif %}
+
+{% if certification_form %}
+<form id="certification_form" action="{{certification_form.push_addr}}" method="POST">
+    {% csrf_token %}
+    {{ certification_form.elements.as_ul }}
+    <input type="submit" />
+</form>
+{% endif %}
+{% endblock %}

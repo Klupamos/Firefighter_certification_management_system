@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<link rel="stylesheet" type"text/css" href="static/default.css" />
+		<link rel="stylesheet" type"text/css" href="/static/default.css" />
         <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script type="text/javascript">document.cookie="javascript_enabled=1;"</script>
 		{% block head %}{% endblock %}

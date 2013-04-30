@@ -1,30 +1,31 @@
 from django.conf.urls import patterns, include, url
-from fire_fighter_site.views.presentation import login, logout, candidate_registration, public_certs, account_info, account_certs, training, certifying, admin
+from fire_fighter_site.views.presentation import account, training, certifying, administrator, certifications
+from fire_fighter_site.views.ajax import certifying_response, definition_response
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$',                      login.display),
-    url(r'^login$',                 login.display),
-    url(r'^logout$',                logout.display),
-    url(r'^candidate_registration$',candidate_registration.display),
-    url(r'^public_certs$',          public_certs.display),
-    url(r'^account_info$',          account_info.display),
-    url(r'^account_certs$',         account_certs.display),
-    url(r'^training$',              training.display),
-    url(r'^certifying$',            certifying.display),
-    url(r'^admin$',                 admin.display),
-    url(r'^admin/display/([a-zA-Z]*)$',admin.display),
-                       
-    # Examples:
-    # url(r'^$', 'fire_fighter_site.views.home', name='home'),
-    # url(r'^fire_fighter_site/', include('fire_fighter_site.foo.urls')),
+    # presentations views
+    url(r'^certifications$',       certifications.display),
 
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    url(r'^account/registration$',  account.registration),
+    url(r'^account/login$',         account.login),
+    url(r'^account/logout$',        account.logout),
+    url(r'^account/modification$',  account.modify),
+    
+    url(r'^training/display$',      training.display),
+    
+    url(r'^certifying/display$',    certifying.display),
+    url(r'^certifying/filter$',     certifying_response.candidate_filter),
 
-    # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
+    url(r'^administrator/definition$',      administrator.definition),
+    url(r'^administrator/definition/pull/requirement$',      definition_response.pull_requirement),
+    url(r'^administrator/definition/pull/certification$',    definition_response.pull_certification),
+    url(r'^administrator/definition/push/requirement$',      definition_response.push_requirement),
+    url(r'^administrator/definition/push/certification$',    definition_response.push_certification),
+    
+    #catch all redirects to login
+    url(r'^.*$',                      account.login),
 )

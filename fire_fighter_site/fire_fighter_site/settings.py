@@ -2,8 +2,11 @@
 import os.path
 import ConfigParser
 
+CONFIG_FILE = 'fire_fighter_site.cfg'
+
+#Why is this neccisary again?
 config = ConfigParser.ConfigParser()
-config.read('fire_fighter_site.cfg')
+config.read(CONFIG_FILE)
 
 DEBUG = config.getboolean('Other','debug')
 
@@ -14,8 +17,6 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
-
-
 
 DATABASES = {
     'default': {
