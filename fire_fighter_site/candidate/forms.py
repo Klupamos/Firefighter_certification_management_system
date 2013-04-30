@@ -158,4 +158,5 @@ class CertificationDefinitionForm(ModelForm):
         CERT_SELECTION.extend(ALL_CERTS)
         
         self.fields['selection'] = forms.ChoiceField(choices = CERT_SELECTION)
+        self.fields['description'] = forms.CharField(widget=forms.Textarea)
         

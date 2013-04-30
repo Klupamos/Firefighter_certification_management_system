@@ -49,7 +49,55 @@
 		left: 200px;
 		margin: 20px;
 	}
-    
+
+    div.content ul{
+        margin:  0px 0px 0px 0px;
+        padding: 0px 0px 0px 10px;
+        list-style-type: none;
+        text-align: left;
+    }
+
+    ul li{
+        width:400px;
+        padding: 0px;
+        margin:  0px;
+        vertical-align:middle;
+    }
+
+    ul li label{
+        width: 150px;
+        text-align:left;
+        display:block;
+        float:left;
+    }
+
+    ul li input,select{
+        width: 250px;
+    }
+
+    ul li input[type="checkbox"]{
+        width: 15px;
+    }
+
+    ul li textarea{
+        width: 400px;
+        height: 50px;
+    }
+
+    input[type="submit"]{
+        display:block;
+        width: 75px;
+        margin-left:auto;
+        margin-right:auto;
+    }
+
+    div.content form ul{
+        margin:  0px 0px 0px 0px;
+        padding: 0px 0px 0px 10px;
+        list-style-type: none;
+        text-align: left;
+    }
+
     .required label:after{
         color:red;
         content:"*";

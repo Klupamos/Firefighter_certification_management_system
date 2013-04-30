@@ -30,16 +30,17 @@ cert4.save()
 
 j1 = Jurisdiction.objects.get_or_create(name = "Fairbanks")[0]
 j2 = Jurisdiction.objects.get_or_create(name = "North pole")[0]
+j3 = Jurisdiction.objects.get_or_create(name = "Anchorage")[0]
 
 
 c1 = Candidate.objects.get_or_create(email_address = "A@B.com", first_name = "Redmond", last_name = "Mann", phone_number = 9074565588, street_address = "quiggly ln", city_name = "Fairbanks", postal_code = 45337, state_abrv = "AK")[0]
 c1.set_password("rootpass")
 c1.jurisdiction = j1
 c1.Request_Jurisdiction_Transfer(j2)
-c1.Add_Requirements(req1, req3)
+c1.Add_Requirements(req1, req2, req3)
+c1.Make_Training_Officer_of(j1, j2)
+c1.Make_Certifying_Officer_of(j1, j2)
 c1.Make_Administrator()
-c1.Make_Certifying_Officer_of(j1)
-c1.Make_Certifying_Officer_of(j2)
 c1.save()
 
 

@@ -29,31 +29,31 @@
 {% endblock %}
 
 {% block content %}
-
-<pre>
-{% for y in x %}
-    {{y}}
-{%endfor%}
-</pre>
 {% if full_cert %}
 <h3>Earned</h3>
 {% for cert in full_cert %}
-<div class="earned certification">
+<div class="certification">
 	<h3 class="cert_name">
         {{ cert.name }}
         {% if cert.expiration %}<span class="expiry">(valid thru {{ cert.expiration }})</span>{% endif %}
     </h3>
-    <h5 class="cert_desc">{{ cert.description }}</h5>
+    <h4 class="cert_desc">{{ cert.description }}</h4>
+    {% if cert.sub_reqs %}
+    <h5>Requirements</h5>
     <ul class="cert_requirements">
 	{% for req in cert.sub_reqs %}
-		<li> {{req.name}} </li>
+		<li class="earned"> {{req.name}} </li>
 	{% endfor %}
     </ul>
+    {%endif%}
+    {% if cert.sub_certs %}
+    <h5>Certifications</h5>
     <ul class="cert_certifications">
 	{% for cert in cert.sub_certs %}
-		<li> {{cert.name}} </li>
+		<li class="earned"> {{cert.name}} </li>
 	{% endfor %}
 	</ul>
+	{% endif %}
 </div>
 {% endfor %}
 {% else %}
@@ -66,17 +66,23 @@
 {% for cert in part_cert %}
 <div class="certification">
 	<h3 class="cert_name">{{ cert.name }}</h3>
-    <h5 class="cert_desc">{{ cert.description }}</h5>
+    <h4 class="cert_desc">{{ cert.description }}</h4>
+    {% if cert.sub_reqs %}
+    <h5>Requirements</h5>
     <ul class="cert_requirements">
 	{% for req in cert.sub_reqs %}
 		<li {% if req.earned %}class="earned"{% endif %}> {{req.name}} </li>
 	{% endfor %}
     </ul>
+    {%endif%}
+    {% if cert.sub_certs %}
+    <h5>Certifications</h5>
     <ul class="cert_certifications">
 	{% for cert in cert.sub_certs %}
 		<li{% if req.earned %}class="earned"{% endif %}> {{cert.name}} </li>
 	{% endfor %}
 	</ul>
+	{% endif %}
 </div>
 {% endfor %}
 {% else %}
@@ -89,17 +95,23 @@
 {% for cert in none_cert %}
 <div class="certification">
 	<h3 class="cert_name">{{ cert.name }}</h3>
-    <h5 class="cert_desc">{{ cert.description }}</h5>
+    <h4 class="cert_desc">{{ cert.description }}</h4>
+    {% if cert.sub_reqs %}
+    <h5>Requirements</h5>
     <ul class="cert_requirements">
 	{% for req in cert.sub_reqs %}
 		<li> {{req.name}} </li>
 	{% endfor %}
     </ul>
+    {%endif%}
+    {% if cert.sub_certs %}
+    <h5>Certifications</h5>
     <ul class="cert_certifications">
 	{% for cert in cert.sub_certs %}
 		<li> {{cert.name}} </li>
 	{% endfor %}
 	</ul>
+	{% endif %}
 </div>
 {% endfor %}
 {% endif %}

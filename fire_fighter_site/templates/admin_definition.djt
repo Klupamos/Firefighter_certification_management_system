@@ -22,16 +22,26 @@ function get_cookie ( cookie_name ){
         return null;
 }
 
+var r = Array();
 function display_results(index, element){
      // 'this' provided by jQuery.proxy()
+     me = jQuery(element);
      if (this[element.name] !== undefined){
-         jQuery(element).val(this[element.name]);
+
+         r.push(me);
+         if (me.is('[type="checkbox"]')){
+            console.log(me.attr('checked'));
+            me.attr('checked', this[element.name]);
+            console.log(me.attr('checked'));
+         }else{
+            me.val(this[element.name]);
+         }
      }
  }
 
 var debug_data; // set to the result of the jQuery.post()
 function AjaxPost(destination_url, me){
-
+    r = Array();
     var sel_option = jQuery(me).children().filter(":selected");
     var this_form = jQuery(me).parents("form");
 
@@ -50,15 +60,15 @@ function AjaxPost(destination_url, me){
         }
     ).done(function(data){
         debug_data = data;
-        if (data[1] == true){
-            this_form.find('[name]').map(jQuery.proxy(display_results, data[0]))
+        if (data[0] == true){
+            console.log(data[1]);
+            this_form.find('[name]').map(jQuery.proxy(display_results, data[1]))
         }
     }).fail(function(data){
         debug_data = data;
     });
 };
-
-
+var x;
 $(document).ready(function(){
     $("#requirement_form #id_selection").change(function(){
         AjaxPost("{{requirement_form.pull_addr}}", $("#requirement_form #id_selection"));
@@ -66,6 +76,40 @@ $(document).ready(function(){
 
     $("#certification_form #id_selection").change(function(){
         AjaxPost("{{certification_form.pull_addr}}", $("#certification_form #id_selection"));
+    });
+    
+    jQuery("form").submit(function(event){
+        event.preventDefault();
+        var me = jQuery(this);
+        jQuery.post(
+            me.attr('action'),
+            me.serialize()
+        ).done(function(data) {
+            debug_data = data;
+            console.log(data);
+            if (data[0] === true){
+                me.find('[name="selection"] option:selected').text(
+                    me.find('[name="name"]').val()
+                );
+
+                if (me.attr('id') == 0){
+
+
+                }
+
+                // caution: extremely brittle code to update child certification and requirement choice fields
+                var value = data[2];
+                var name = "child_" + me.attr('action').split('/')[4] + "s";
+                $('form[id="certification_form"] [name="'+ name + '"] option[value="'+ value +'"]').text(
+                    me.find('[name="name"]').val()
+                )
+            }else{
+                alert(data[1]);
+            }
+        }).fail(function(data){
+            debug_data = data;
+        });
+
     });
 
 });
@@ -76,7 +120,9 @@ $(document).ready(function(){
 {% if requirement_form %}
 <form id="requirement_form" action="{{requirement_form.push_addr}}" method="POST">
     {% csrf_token %}
+    <ul>
     {{ requirement_form.elements.as_ul }}
+    </ul>
     <input type="submit" />
 </form>
 {% endif %}
@@ -84,7 +130,9 @@ $(document).ready(function(){
 {% if certification_form %}
 <form id="certification_form" action="{{certification_form.push_addr}}" method="POST">
     {% csrf_token %}
+    <ul>
     {{ certification_form.elements.as_ul }}
+    </ul>
     <input type="submit" />
 </form>
 {% endif %}
