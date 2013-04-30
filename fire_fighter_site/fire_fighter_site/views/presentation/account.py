@@ -90,13 +90,18 @@ def modify(request):
                 print "Changing password to: '" + form.cleaned_data['new_password'] +"'"
                 cand.set_password(form.cleaned_data['new_password'])
             
+            
             orig = Candidate.objects.get(pk = cand.pk)
             if orig.jurisdiction ==  form.cleaned_data['jurisdiction']:
                 cand.Revoke_Transfer_Request()
             else:
                 cand.Request_Jurisdiction_Transfer(form.cleaned_data['jurisdiction'])
                 errors = "Transfer Request Submitted"                
-                
+            
+            form.save()
+            
+
+            
 
     template_file = 'account_info_template.djt'
     context_dict = {}

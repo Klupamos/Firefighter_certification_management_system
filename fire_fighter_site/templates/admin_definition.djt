@@ -30,9 +30,9 @@ function display_results(index, element){
 
          r.push(me);
          if (me.is('[type="checkbox"]')){
-            console.log(me.attr('checked'));
-            me.attr('checked', this[element.name]);
-            console.log(me.attr('checked'));
+//            console.log(me.attr('checked'));
+//            me.attr('checked', this[element.name]);
+//            console.log(me.attr('checked'));
          }else{
             me.val(this[element.name]);
          }

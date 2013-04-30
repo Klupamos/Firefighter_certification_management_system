@@ -13,17 +13,17 @@ from candidate.models import *
 # Removes everything ending with sql lite
 
 #get_or_create does a save
-req1 = Requirement.objects.get_or_create(name = "Kill 50 chickens")[0]
-req2 = Requirement.objects.get_or_create(name = "Kill 50 dolphins")[0]
-req3 = Requirement.objects.get_or_create(name = "Kill 50 small animals")[0]
-req4 = Requirement.objects.get_or_create(name = "Be my facebook friend")[0]
+req1 = Requirement.objects.get_or_create(name = "Drive a firetruck")[0]
+req2 = Requirement.objects.get_or_create(name = "Save 50 children")[0]
+req3 = Requirement.objects.get_or_create(name = "Save 50 small animals")[0]
+req4 = Requirement.objects.get_or_create(name = "Attend 100 hours of lecture")[0]
 
 
-cert3 = Certification.objects.get_or_create(name = "Completed World of Warcraft Quest", description = "Complete all three requirements for the quest")[0]
+cert3 = Certification.objects.get_or_create(name = "Firefighter 2", description = "Complete all three intermediate requiremtns")[0]
 cert3.Add_Requirements(req1, req2, req3)
 cert3.save()
 
-cert4 = Certification.objects.get_or_create(name = "Become my best friend", description = "Be friendly")[0]
+cert4 = Certification.objects.get_or_create(name = "Firefighter 1", description = "Complete 100 hours of lecture")[0]
 cert4.Add_Requirements(req4)
 cert4.save()
 
