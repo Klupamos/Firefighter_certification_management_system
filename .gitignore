@@ -2,10 +2,10 @@
 *.so
 *.pyc
 
-#vim swap files
+# vim swap files
 *.swp
 
-#pycharm
+# pycharm
 *.idea
 
 # Packages

@@ -2,25 +2,31 @@
 
 {% block head %}
 <script>
-
+function get_cookie ( cookie_name ){
+    var results = document.cookie.match ( '(^|;) ?' + cookie_name + '=([^;]*)(;|$)' );
+    if ( results )
+        return ( unescape ( results[2] ) );
+    else
+        return null;
+}
 $(document).ready(function(){
     $("#Certification_Prescreening li select").change(function(){
         $("#candidate_list").fadeOut(100);
-        $.post(
-            "{{ form_handel }}",
-            $("#eligible_filter").serialize()
-        ).done(function(data){
+        $.post("{{ form_handel }}",
+        $("#eligible_filter").serialize()
+        ).done(function(data,status){
             $("#candidate_list").promise().done(function(){
                 this.empty();
                 for (var i = 0; i<data.length; i++){
-                    $("#candidate_list").append(
-                        $("<li></li>").text(data[i])
-                    )
+                    var item = document.createElement('li');
+                    $(item).text(data[i]);
+                    $("#candidate_list").append(item)
                 }
                 $("#candidate_list").fadeIn(100);
+
             });
-        }).fail(function(data, text_Status, errorThrown){
-            alert("An "+errorThrown+" error has occured. Please try logging out and then back in.");
+        }).fail(function(data, status){
+            alert("An \'"+ status +"\' Error has occured");
         });
     });
     $("#Certification_Prescreening li:first select").trigger('change');
